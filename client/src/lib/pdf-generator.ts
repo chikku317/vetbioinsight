@@ -50,10 +50,11 @@ export function generateVetReportPDF(
 
   // Header - ThePetNest professional header using provided image
   try {
-    // Add the header image with proper aspect ratio (original is approximately 900x200px)
-    const headerHeight = 35; // Better proportional height
+    // Add the header image with proper dimensions: 794 x 150 pixels (5.3:1 aspect ratio)
+    // Convert to PDF units: 794px at 96 DPI = ~210mm, 150px = ~40mm
+    const headerHeight = 40; // 40mm height as specified
     pdf.addImage(headerImagePath, 'PNG', 0, 0, pageWidth, headerHeight);
-    currentY = headerHeight + 15; // More spacing below header
+    currentY = headerHeight + 10; // Spacing below header
   } catch (error) {
     console.warn("Could not load header image, using fallback:", error);
     // Fallback header if image fails to load
@@ -68,7 +69,7 @@ export function generateVetReportPDF(
     addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
     addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
     pdf.setTextColor(0, 0, 0);
-    currentY = 65;
+    currentY = 60;
   }
   
   // Report title
