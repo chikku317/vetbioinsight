@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import { VetReport, TestResults, Species } from "@shared/schema";
 import { referenceRanges, getTestStatus, getStatusLabel } from "./reference-ranges";
 import { generateClinicalInterpretations, generateOverallAssessment } from "./clinical-interpreter";
+import headerImagePath from "@assets/Lab Header The PetNest_1754069909688.png";
 
 export interface PDFGenerationOptions {
   includelogo?: boolean;
@@ -47,30 +48,29 @@ export function generateVetReportPDF(
     }
   };
 
-  // Header - ThePetNest professional header (using fallback design for now)
-  // Dark blue background bar matching the uploaded design
-  pdf.setFillColor(52, 73, 151); // Dark blue color from header
-  pdf.rect(0, 0, pageWidth, 50, "F");
-  
-  // Orange accent on the right
-  pdf.setFillColor(255, 140, 0); // Orange color
-  pdf.rect(pageWidth - 40, 0, 40, 50, "F");
-  
-  // White text on dark background
-  pdf.setTextColor(255, 255, 255);
-  addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
-  addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
-  
-  // Contact information aligned to right
-  addText("8848216190 | 8590433937", pageWidth - 50, 18, { fontSize: 12, fontStyle: "bold" });
-  
-  // Address information
-  addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
-  addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
-  
-  // Reset text color and set current position
-  pdf.setTextColor(0, 0, 0);
-  currentY = 60;
+  // Header - ThePetNest professional header using provided image
+  try {
+    // Add the header image at the top of the page
+    // The image should span the full width and maintain proper aspect ratio
+    const headerHeight = 40; // Adjust height as needed for good proportions
+    pdf.addImage(headerImagePath, 'PNG', 0, 0, pageWidth, headerHeight);
+    currentY = headerHeight + 10; // Set position below header with some spacing
+  } catch (error) {
+    console.warn("Could not load header image, using fallback:", error);
+    // Fallback header if image fails to load
+    pdf.setFillColor(52, 73, 151);
+    pdf.rect(0, 0, pageWidth, 50, "F");
+    pdf.setFillColor(255, 140, 0);
+    pdf.rect(pageWidth - 40, 0, 40, 50, "F");
+    pdf.setTextColor(255, 255, 255);
+    addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
+    addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
+    addText("8848216190 | 8590433937", pageWidth - 50, 18, { fontSize: 12, fontStyle: "bold" });
+    addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
+    addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
+    pdf.setTextColor(0, 0, 0);
+    currentY = 60;
+  }
   
   // Report title
   addText("BIOCHEMISTRY ANALYSIS REPORT", pageWidth / 2, currentY, { fontSize: 16, fontStyle: "bold", align: "center" });
