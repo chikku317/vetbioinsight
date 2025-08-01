@@ -47,7 +47,7 @@ export default function Home() {
                 <Microscope className="h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">VetLab Analyzer</h1>
+                <h1 className="text-2xl font-bold text-gray-900">ThePetNest Analyzer</h1>
                 <p className="text-sm text-medical-gray">Biochemistry Report Generator</p>
               </div>
             </div>

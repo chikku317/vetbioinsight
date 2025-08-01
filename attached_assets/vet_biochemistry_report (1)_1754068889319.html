@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinary Biochemistry Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .report-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c5aa0, #1e3d72);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .clinic-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .clinic-details {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .report-title {
+            font-size: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+        }
+        
+        .patient-info {
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #2c5aa0;
+            min-width: 100px;
+            margin-right: 10px;
+        }
+        
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .results-section {
+            padding: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #2c5aa0;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #2c5aa0;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .results-table th {
+            background: #2c5aa0;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .results-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+        }
+        
+        .results-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .results-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        .parameter {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .result-value {
+            font-weight: bold;
+            color: #1976d2;
+        }
+        
+        .reference-range {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .unit {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .flag {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .flag.high {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .flag.low {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .flag.normal {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 25px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        
+        .signature-block {
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #333;
+            margin-bottom: 5px;
+            height: 40px;
+        }
+        
+        .notes {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .notes-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+        
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .print-btn:hover {
+            background: #1e3d72;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .print-btn {
+                display: none;
+            }
+            
+            .report-container {
+                box-shadow: none;
+                max-width: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .signatures {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .results-table {
+                font-size: 12px;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
+    
+    <div class="report-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="clinic-name">PAWCARE VETERINARY CLINIC</div>
+            <div class="clinic-details">
+                123 Main Street, Veterinary District, City 12345<br>
+                Phone: (555) 123-4567 | Email: info@pawcarevet.com<br>
+                License No: VET2024-001 | Registration: ABC123456
+            </div>
+            <div class="report-title">BIOCHEMISTRY ANALYSIS REPORT</div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="patient-info">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Patient Name:</span>
+                    <span class="info-value">Max</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Species:</span>
+                    <span class="info-value">Canine</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Breed:</span>
+                    <span class="info-value">Golden Retriever</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Age:</span>
+                    <span class="info-value">5 years</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Sex:</span>
+                    <span class="info-value">Male (Neutered)</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Weight:</span>
+                    <span class="info-value">32 kg</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Owner:</span>
+                    <span class="info-value">John Smith</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Pet ID:</span>
+                    <span class="info-value">PET-2024-0156</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Sample Date:</span>
+                    <span class="info-value">March 15, 2024</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Report Date:</span>
+                    <span class="info-value">March 16, 2024</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Sample Type:</span>
+                    <span class="info-value">Serum</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Dr. Referred:</span>
+                    <span class="info-value">Dr. Sarah Johnson</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section">
+            <!-- Liver Function Tests -->
+            <div class="section-title">LIVER FUNCTION TESTS</div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Result</th>
+                        <th>Unit</th>
+                        <th>Reference Range (Canine)</th>
+                        <th>Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="parameter">Alanine Aminotransferase (ALT)</td>
+                        <td class="result-value">45</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">12-118 U/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Aspartate Aminotransferase (AST)</td>
+                        <td class="result-value">38</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">13-15 U/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Alkaline Phosphatase (ALP)</td>
+                        <td class="result-value">89</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">5-131 U/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Gamma Glutamyl Transferase (GGT)</td>
+                        <td class="result-value">8</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">1.2-6.4 U/L</td>
+                        <td><span class="flag high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Total Bilirubin</td>
+                        <td class="result-value">0.3</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">0.1-0.6 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Direct Bilirubin</td>
+                        <td class="result-value">0.1</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">0.0-0.18 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Kidney Function Tests -->
+            <div class="section-title">KIDNEY FUNCTION TESTS</div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Result</th>
+                        <th>Unit</th>
+                        <th>Reference Range (Canine)</th>
+                        <th>Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="parameter">Blood Urea Nitrogen (BUN)</td>
+                        <td class="result-value">18</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">6-31 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Creatinine</td>
+                        <td class="result-value">1.1</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">0.5-1.6 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">BUN/Creatinine Ratio</td>
+                        <td class="result-value">16</td>
+                        <td class="unit">-</td>
+                        <td class="reference-range">4-27</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Phosphorus</td>
+                        <td class="result-value">4.2</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">2.5-6.8 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Electrolytes and Minerals -->
+            <div class="section-title">ELECTROLYTES & MINERALS</div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Result</th>
+                        <th>Unit</th>
+                        <th>Reference Range (Canine)</th>
+                        <th>Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="parameter">Sodium (Na+)</td>
+                        <td class="result-value">148</td>
+                        <td class="unit">mEq/L</td>
+                        <td class="reference-range">139-154 mEq/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Potassium (K+)</td>
+                        <td class="result-value">4.1</td>
+                        <td class="unit">mEq/L</td>
+                        <td class="reference-range">3.6-5.5 mEq/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Chloride (Cl-)</td>
+                        <td class="result-value">108</td>
+                        <td class="unit">mEq/L</td>
+                        <td class="reference-range">102-117 mEq/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Calcium (Total)</td>
+                        <td class="result-value">9.8</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">8.9-11.4 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Magnesium</td>
+                        <td class="result-value">2.1</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">1.5-2.5 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Proteins -->
+            <div class="section-title">PROTEINS</div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Result</th>
+                        <th>Unit</th>
+                        <th>Reference Range (Canine)</th>
+                        <th>Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="parameter">Total Protein</td>
+                        <td class="result-value">6.8</td>
+                        <td class="unit">g/dL</td>
+                        <td class="reference-range">5.0-7.4 g/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Albumin</td>
+                        <td class="result-value">3.2</td>
+                        <td class="unit">g/dL</td>
+                        <td class="reference-range">2.7-4.4 g/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Globulin</td>
+                        <td class="result-value">3.6</td>
+                        <td class="unit">g/dL</td>
+                        <td class="reference-range">1.6-3.6 g/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">A/G Ratio</td>
+                        <td class="result-value">0.89</td>
+                        <td class="unit">-</td>
+                        <td class="reference-range">0.8-2.0</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Glucose and Metabolic -->
+            <div class="section-title">GLUCOSE & METABOLIC PARAMETERS</div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Result</th>
+                        <th>Unit</th>
+                        <th>Reference Range (Canine)</th>
+                        <th>Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="parameter">Glucose</td>
+                        <td class="result-value">92</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">70-138 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Cholesterol</td>
+                        <td class="result-value">195</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">92-324 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Triglycerides</td>
+                        <td class="result-value">110</td>
+                        <td class="unit">mg/dL</td>
+                        <td class="reference-range">29-291 mg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Amylase</td>
+                        <td class="result-value">645</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">290-1125 U/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Lipase</td>
+                        <td class="result-value">315</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">77-695 U/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Additional Parameters -->
+            <div class="section-title">ADDITIONAL PARAMETERS</div>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Result</th>
+                        <th>Unit</th>
+                        <th>Reference Range (Canine)</th>
+                        <th>Flag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="parameter">Creatine Kinase (CK)</td>
+                        <td class="result-value">198</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">59-895 U/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Lactate Dehydrogenase (LDH)</td>
+                        <td class="result-value">125</td>
+                        <td class="unit">U/L</td>
+                        <td class="reference-range">45-233 U/L</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Iron</td>
+                        <td class="result-value">142</td>
+                        <td class="unit">μg/dL</td>
+                        <td class="reference-range">94-122 μg/dL</td>
+                        <td><span class="flag high">High</span></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">Total Iron Binding Capacity (TIBC)</td>
+                        <td class="result-value">385</td>
+                        <td class="unit">μg/dL</td>
+                        <td class="reference-range">252-518 μg/dL</td>
+                        <td><span class="flag normal">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Notes and Comments -->
+        <div class="notes">
+            <div class="notes-title">Clinical Notes & Interpretation:</div>
+            <p>• GGT levels are slightly elevated, may indicate early hepatic stress or bile duct involvement. Recommend monitoring and dietary management.</p>
+            <p>• Iron levels are above normal range - consider evaluating for hemolysis or iron metabolism disorders.</p>
+            <p>• Overall kidney function parameters are within normal limits.</p>
+            <p>• Protein levels and electrolyte balance are appropriate for age and species.</p>
+            <p>• Glucose levels are normal, no indication of diabetes mellitus.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Methodology:</strong> Automated chemistry analyzer (Beckman Coulter AU480) with species-specific calibration standards.</p>
+            <p><strong>Quality Control:</strong> All tests performed with appropriate quality control materials and within acceptable limits.</p>
+            <p><strong>Sample Condition:</strong> Serum sample received in good condition, no hemolysis or lipemia detected.</p>
+            
+            <div class="signatures">
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <p><strong>Dr. Michael Chen, DVM</strong><br>
+                    Clinical Pathologist<br>
+                    License: VET-CP-2019-045<br>
+                    Date: March 16, 2024</p>
+                </div>
+                <div class="signature-block">
+                    <div class="signature-line"></div>
+                    <p><strong>Laboratory Supervisor</strong><br>
+                    Sarah Williams, MT(ASCP)<br>
+                    Cert: LAB-SUP-2020-123<br>
+                    Date: March 16, 2024</p>
+                </div>
+            </div>
+            
+            <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+                This report contains confidential medical information. Distribution should be limited to authorized veterinary personnel only.<br>
+                For questions regarding this report, please contact our laboratory at (555) 123-4567 ext. Lab
+            </p>
+        </div>
+    </div>
+</body>
+</html>

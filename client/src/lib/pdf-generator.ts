@@ -73,7 +73,7 @@ export function generateVetReportPDF(
   currentY = 60;
   
   // Report title
-  addText("VETERINARY BIOCHEMISTRY ANALYSIS REPORT", pageWidth / 2, currentY, { fontSize: 16, fontStyle: "bold", align: "center" });
+  addText("BIOCHEMISTRY ANALYSIS REPORT", pageWidth / 2, currentY, { fontSize: 16, fontStyle: "bold", align: "center" });
   currentY += 10;
   
   addText(`Report ID: TPN-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`, pageWidth - 20, currentY, { align: "right", fontSize: 10 });
@@ -145,46 +145,46 @@ export function generateVetReportPDF(
   // Test panels
   const testPanels = [
     {
-      name: "HEPATIC FUNCTION PANEL",
+      name: "LIVER FUNCTION TESTS",
       tests: [
         { key: "alt", name: "Alanine Aminotransferase (ALT)", range: ranges.alt },
         { key: "alp", name: "Alkaline Phosphatase (ALP)", range: ranges.alp },
-        { key: "ggt", name: "Gamma-Glutamyl Transferase (GGT)", range: ranges.ggt },
+        { key: "ggt", name: "Gamma Glutamyl Transferase (GGT)", range: ranges.ggt },
         { key: "totalBilirubin", name: "Total Bilirubin", range: ranges.totalBilirubin }
       ]
     },
     {
-      name: "RENAL FUNCTION PANEL",
+      name: "KIDNEY FUNCTION TESTS",
       tests: [
         { key: "bun", name: "Blood Urea Nitrogen (BUN)", range: ranges.bun },
-        { key: "creatinine", name: "Creatinine", range: ranges.creatinine }
+        { key: "creatinine", name: "Creatinine", range: ranges.creatinine },
+        { key: "phosphorus", name: "Phosphorus", range: ranges.phosphorus }
       ]
     },
     {
-      name: "PANCREATIC FUNCTION PANEL",
+      name: "ELECTROLYTES & MINERALS",
       tests: [
-        { key: "amylase", name: "Amylase", range: ranges.amylase },
-        { key: "lipase", name: "Lipase", range: ranges.lipase }
-      ]
-    },
-    {
-      name: "GLUCOSE & ELECTROLYTES",
-      tests: [
-        { key: "glucose", name: "Glucose", range: ranges.glucose },
         { key: "sodium", name: "Sodium (Na+)", range: ranges.sodium },
         { key: "potassium", name: "Potassium (K+)", range: ranges.potassium },
-        { key: "chloride", name: "Chloride (Cl-)", range: ranges.chloride }
+        { key: "chloride", name: "Chloride (Cl-)", range: ranges.chloride },
+        { key: "calcium", name: "Calcium (Total)", range: ranges.calcium }
       ]
     },
     {
-      name: "PROTEINS & OTHER",
+      name: "PROTEIN STUDIES",
       tests: [
         { key: "totalProtein", name: "Total Protein", range: ranges.totalProtein },
         { key: "albumin", name: "Albumin", range: ranges.albumin },
-        { key: "globulin", name: "Globulin", range: ranges.globulin },
+        { key: "globulin", name: "Globulin", range: ranges.globulin }
+      ]
+    },
+    {
+      name: "METABOLISM & ENZYMES",
+      tests: [
+        { key: "glucose", name: "Glucose", range: ranges.glucose },
         { key: "cholesterol", name: "Cholesterol", range: ranges.cholesterol },
-        { key: "phosphorus", name: "Phosphorus", range: ranges.phosphorus },
-        { key: "calcium", name: "Calcium (Ca++)", range: ranges.calcium }
+        { key: "amylase", name: "Amylase", range: ranges.amylase },
+        { key: "lipase", name: "Lipase", range: ranges.lipase }
       ]
     }
   ];

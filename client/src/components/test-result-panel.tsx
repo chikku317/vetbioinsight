@@ -89,12 +89,12 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
 
   return (
     <div className="space-y-6">
-      {/* Hepatic Function Panel */}
+      {/* Liver Function Tests */}
       <Card>
         <CardHeader className="border-b border-gray-200">
           <CardTitle className="flex items-center text-lg">
             <Activity className="text-medical-blue mr-2 h-5 w-5" />
-            Hepatic Function Panel
+            Liver Function Tests
           </CardTitle>
           <p className="text-sm text-medical-gray mt-1">Liver enzyme and function markers</p>
         </CardHeader>
@@ -102,7 +102,7 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TestField form={form} testKey="alt" label="Alanine Aminotransferase (ALT)" unit="U/L" species={species} />
             <TestField form={form} testKey="alp" label="Alkaline Phosphatase (ALP)" unit="U/L" species={species} />
-            <TestField form={form} testKey="ggt" label="Gamma-Glutamyl Transferase (GGT)" unit="U/L" species={species} />
+            <TestField form={form} testKey="ggt" label="Gamma Glutamyl Transferase (GGT)" unit="U/L" species={species} />
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <FormLabel className="text-sm font-medium text-gray-700">Total Bilirubin</FormLabel>
@@ -170,19 +170,20 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
         </CardContent>
       </Card>
 
-      {/* Renal Function Panel */}
+      {/* Kidney Function Tests */}
       <Card>
         <CardHeader className="border-b border-gray-200">
           <CardTitle className="flex items-center text-lg">
             <Cat className="text-medical-blue mr-2 h-5 w-5" />
-            Renal Function Panel
+            Kidney Function Tests
           </CardTitle>
-          <p className="text-sm text-medical-gray mt-1">Cat function markers</p>
+          <p className="text-sm text-medical-gray mt-1">Kidney function markers</p>
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TestField form={form} testKey="bun" label="Blood Urea Nitrogen (BUN)" unit="mg/dL" species={species} />
             <TestField form={form} testKey="creatinine" label="Creatinine" unit="mg/dL" species={species} step="0.1" />
+            <TestField form={form} testKey="phosphorus" label="Phosphorus" unit="mg/dL" species={species} step="0.1" />
           </div>
 
           {/* Clinical Alert for Renal Issues */}
@@ -202,90 +203,58 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
         </CardContent>
       </Card>
 
-      {/* Pancreatic Function Panel */}
-      <Card>
-        <CardHeader className="border-b border-gray-200">
-          <CardTitle className="flex items-center text-lg">
-            <Activity className="text-medical-blue mr-2 h-5 w-5" />
-            Pancreatic Function Panel
-          </CardTitle>
-          <p className="text-sm text-medical-gray mt-1">Pancreatic enzyme markers</p>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TestField form={form} testKey="amylase" label="Amylase" unit="U/L" species={species} />
-            <TestField form={form} testKey="lipase" label="Lipase" unit="U/L" species={species} />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Glucose & Electrolytes Panel */}
+      {/* Electrolytes & Minerals */}
       <Card>
         <CardHeader className="border-b border-gray-200">
           <CardTitle className="flex items-center text-lg">
             <Zap className="text-medical-blue mr-2 h-5 w-5" />
-            Glucose & Electrolytes Panel
+            Electrolytes & Minerals
           </CardTitle>
-          <p className="text-sm text-medical-gray mt-1">Blood glucose and electrolyte balance</p>
+          <p className="text-sm text-medical-gray mt-1">Electrolyte balance and mineral levels</p>
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TestField form={form} testKey="glucose" label="Glucose" unit="mg/dL" species={species} />
             <TestField form={form} testKey="sodium" label="Sodium (Na+)" unit="mEq/L" species={species} />
             <TestField form={form} testKey="potassium" label="Potassium (K+)" unit="mEq/L" species={species} step="0.1" />
             <TestField form={form} testKey="chloride" label="Chloride (Cl-)" unit="mEq/L" species={species} />
+            <TestField form={form} testKey="calcium" label="Calcium (Total)" unit="mg/dL" species={species} step="0.1" />
           </div>
         </CardContent>
       </Card>
 
-      {/* Proteins & Other Panel */}
+      {/* Protein Studies */}
       <Card>
         <CardHeader className="border-b border-gray-200">
           <CardTitle className="flex items-center text-lg">
             <Dna className="text-medical-blue mr-2 h-5 w-5" />
-            Proteins & Other Panel
+            Protein Studies
           </CardTitle>
-          <p className="text-sm text-medical-gray mt-1">Protein levels and additional biochemical markers</p>
+          <p className="text-sm text-medical-gray mt-1">Protein levels and ratios</p>
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TestField form={form} testKey="totalProtein" label="Total Protein" unit="g/dL" species={species} step="0.1" />
             <TestField form={form} testKey="albumin" label="Albumin" unit="g/dL" species={species} step="0.1" />
-            
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <FormLabel className="text-sm font-medium text-gray-700">Globulin</FormLabel>
-                <Badge className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Auto-calc</Badge>
-              </div>
-              <div className="flex items-center space-x-3">
-                <FormField
-                  control={form.control}
-                  name="testResults.globulin"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          className="bg-gray-100"
-                          readOnly
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <span className="text-sm text-gray-500">g/dL</span>
-              </div>
-              <div className="text-xs text-medical-gray mt-2">
-                Reference: {referenceRanges[species].globulin.min}-{referenceRanges[species].globulin.max} g/dL ({species.charAt(0).toUpperCase() + species.slice(1)})
-              </div>
-            </div>
+            <TestField form={form} testKey="globulin" label="Globulin" unit="g/dL" species={species} step="0.1" />
+          </div>
+        </CardContent>
+      </Card>
 
+      {/* Metabolism & Enzymes */}
+      <Card>
+        <CardHeader className="border-b border-gray-200">
+          <CardTitle className="flex items-center text-lg">
+            <Activity className="text-medical-blue mr-2 h-5 w-5" />
+            Metabolism & Enzymes
+          </CardTitle>
+          <p className="text-sm text-medical-gray mt-1">Metabolic markers and enzyme levels</p>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TestField form={form} testKey="glucose" label="Glucose" unit="mg/dL" species={species} />
             <TestField form={form} testKey="cholesterol" label="Cholesterol" unit="mg/dL" species={species} />
-            <TestField form={form} testKey="phosphorus" label="Phosphorus" unit="mg/dL" species={species} step="0.1" />
-            <TestField form={form} testKey="calcium" label="Calcium (Ca++)" unit="mg/dL" species={species} step="0.1" />
+            <TestField form={form} testKey="amylase" label="Amylase" unit="U/L" species={species} />
+            <TestField form={form} testKey="lipase" label="Lipase" unit="U/L" species={species} />
           </div>
         </CardContent>
       </Card>
