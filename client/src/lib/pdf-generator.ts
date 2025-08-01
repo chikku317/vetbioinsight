@@ -9,10 +9,10 @@ export interface PDFGenerationOptions {
   customHeader?: string;
 }
 
-export async function generateVetReportPDF(
+export function generateVetReportPDF(
   report: VetReport,
   options: PDFGenerationOptions = {}
-): Promise<jsPDF> {
+): jsPDF {
   const pdf = new jsPDF();
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -47,34 +47,30 @@ export async function generateVetReportPDF(
     }
   };
 
-  // Header - Use uploaded ThePetNest header image
-  try {
-    // Import and add the header image
-    const headerImageSrc = await import("@assets/The MAin Header_1754055653864.png");
-    
-    // Add header image at the top of the PDF (scaled to fit page width)
-    pdf.addImage(headerImageSrc.default, 'PNG', 0, 0, pageWidth, 50);
-    
-    currentY = 60; // Start content below the header
-  } catch (error) {
-    // Fallback to text header if image fails to load
-    console.warn("Could not load header image, using text header", error);
-    
-    // Dark blue background bar
-    pdf.setFillColor(52, 73, 151);
-    pdf.rect(0, 0, pageWidth, 50, "F");
-    
-    // White text on dark background
-    pdf.setTextColor(255, 255, 255);
-    addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
-    addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
-    addText("8848216190 | 8590433937", pageWidth - 20, 18, { align: "right", fontSize: 12, fontStyle: "bold" });
-    addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
-    addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
-    
-    pdf.setTextColor(0, 0, 0);
-    currentY = 60;
-  }
+  // Header - ThePetNest professional header (using fallback design for now)
+  // Dark blue background bar matching the uploaded design
+  pdf.setFillColor(52, 73, 151); // Dark blue color from header
+  pdf.rect(0, 0, pageWidth, 50, "F");
+  
+  // Orange accent on the right
+  pdf.setFillColor(255, 140, 0); // Orange color
+  pdf.rect(pageWidth - 40, 0, 40, 50, "F");
+  
+  // White text on dark background
+  pdf.setTextColor(255, 255, 255);
+  addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
+  addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
+  
+  // Contact information aligned to right
+  addText("8848216190 | 8590433937", pageWidth - 50, 18, { fontSize: 12, fontStyle: "bold" });
+  
+  // Address information
+  addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
+  addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
+  
+  // Reset text color and set current position
+  pdf.setTextColor(0, 0, 0);
+  currentY = 60;
   
   // Report title
   addText("VETERINARY BIOCHEMISTRY ANALYSIS REPORT", pageWidth / 2, currentY, { fontSize: 16, fontStyle: "bold", align: "center" });
@@ -197,7 +193,7 @@ export async function generateVetReportPDF(
   const panelsWithValues = testPanels.filter(panel => {
     return panel.tests.some(test => {
       const value = testResults[test.key as keyof TestResults];
-      return value !== undefined && value !== null && value !== "";
+      return value !== undefined && value !== null && String(value).trim() !== "";
     });
   });
 
@@ -206,7 +202,7 @@ export async function generateVetReportPDF(
     // Filter tests within the panel to only include those with values
     const testsWithValues = panel.tests.filter(test => {
       const value = testResults[test.key as keyof TestResults];
-      return value !== undefined && value !== null && value !== "";
+      return value !== undefined && value !== null && String(value).trim() !== "";
     });
 
     if (testsWithValues.length > 0) {

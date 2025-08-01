@@ -15,9 +15,9 @@ interface ReportPreviewModalProps {
 export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = () => {
     try {
-      const pdf = await generateVetReportPDF(report);
+      const pdf = generateVetReportPDF(report);
       pdf.save(`ThePetNest_Report_${report.patientName}_${report.reportDate}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
