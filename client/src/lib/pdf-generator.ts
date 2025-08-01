@@ -9,10 +9,10 @@ export interface PDFGenerationOptions {
   customHeader?: string;
 }
 
-export function generateVetReportPDF(
+export async function generateVetReportPDF(
   report: VetReport,
   options: PDFGenerationOptions = {}
-): jsPDF {
+): Promise<jsPDF> {
   const pdf = new jsPDF();
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -47,30 +47,34 @@ export function generateVetReportPDF(
     }
   };
 
-  // Header - ThePetNest Clinic Header
-  // Dark blue background bar
-  pdf.setFillColor(52, 73, 151); // Dark blue color matching the header
-  pdf.rect(0, 0, pageWidth, 50, "F");
-  
-  // Orange accent (simplified as rectangle for PDF compatibility)
-  pdf.setFillColor(255, 140, 0); // Orange color
-  pdf.rect(pageWidth - 40, 0, 40, 50, "F"); // Simple rectangle instead of triangle
-  
-  // White text on dark background
-  pdf.setTextColor(255, 255, 255);
-  addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
-  addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
-  
-  // Contact information aligned to right
-  addText("8848216190 | 8590433937", pageWidth - 20, 18, { align: "right", fontSize: 12, fontStyle: "bold" });
-  
-  // Address information
-  addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
-  addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
-  
-  // Reset text color and set current position
-  pdf.setTextColor(0, 0, 0);
-  currentY = 70;
+  // Header - Use uploaded ThePetNest header image
+  try {
+    // Import and add the header image
+    const headerImageSrc = await import("@assets/The MAin Header_1754055653864.png");
+    
+    // Add header image at the top of the PDF (scaled to fit page width)
+    pdf.addImage(headerImageSrc.default, 'PNG', 0, 0, pageWidth, 50);
+    
+    currentY = 60; // Start content below the header
+  } catch (error) {
+    // Fallback to text header if image fails to load
+    console.warn("Could not load header image, using text header", error);
+    
+    // Dark blue background bar
+    pdf.setFillColor(52, 73, 151);
+    pdf.rect(0, 0, pageWidth, 50, "F");
+    
+    // White text on dark background
+    pdf.setTextColor(255, 255, 255);
+    addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
+    addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
+    addText("8848216190 | 8590433937", pageWidth - 20, 18, { align: "right", fontSize: 12, fontStyle: "bold" });
+    addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
+    addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
+    
+    pdf.setTextColor(0, 0, 0);
+    currentY = 60;
+  }
   
   // Report title
   addText("VETERINARY BIOCHEMISTRY ANALYSIS REPORT", pageWidth / 2, currentY, { fontSize: 16, fontStyle: "bold", align: "center" });
@@ -189,18 +193,32 @@ export function generateVetReportPDF(
     }
   ];
 
-  testPanels.forEach(panel => {
-    checkPageBreak(25 + panel.tests.length * 8);
-    
-    // Panel header (clean, no background)
-    addText(panel.name, 25, currentY, { fontSize: 12, fontStyle: "bold" });
-    addLine(20, currentY + 3, pageWidth - 20, currentY + 3);
-    currentY += 15;
-
-    panel.tests.forEach(test => {
+  // Filter panels to only include those with values
+  const panelsWithValues = testPanels.filter(panel => {
+    return panel.tests.some(test => {
       const value = testResults[test.key as keyof TestResults];
+      return value !== undefined && value !== null && value !== "";
+    });
+  });
+
+  // Only generate tables for panels that have values
+  panelsWithValues.forEach(panel => {
+    // Filter tests within the panel to only include those with values
+    const testsWithValues = panel.tests.filter(test => {
+      const value = testResults[test.key as keyof TestResults];
+      return value !== undefined && value !== null && value !== "";
+    });
+
+    if (testsWithValues.length > 0) {
+      checkPageBreak(25 + testsWithValues.length * 8);
       
-      if (value !== undefined && value !== null) {
+      // Panel header (clean, no background)
+      addText(panel.name, 25, currentY, { fontSize: 12, fontStyle: "bold" });
+      addLine(20, currentY + 3, pageWidth - 20, currentY + 3);
+      currentY += 15;
+
+      testsWithValues.forEach(test => {
+        const value = testResults[test.key as keyof TestResults];
         const numericValue = typeof value === 'number' ? value : Number(value);
         const status = getTestStatus(numericValue, test.range);
         const statusLabel = getStatusLabel(status);
@@ -218,23 +236,12 @@ export function generateVetReportPDF(
           fontSize: 9,
           fontStyle: status !== "normal" ? "bold" : "normal"
         });
-      } else {
-        // Draw row borders for better table structure
-        pdf.setDrawColor(200, 200, 200);
-        addLine(20, currentY + 2, pageWidth - 20, currentY + 2);
         
-        // Better text placement for "Not Tested" entries
-        addText(test.name, 25, currentY, { fontSize: 9 });
-        addText("Not Tested", 85, currentY, { fontSize: 9 });
-        addText(test.range.unit, 115, currentY, { fontSize: 9 });
-        addText(`${test.range.min}-${test.range.max}`, 140, currentY, { fontSize: 9 });
-        addText("-", 170, currentY, { fontSize: 9 });
-      }
+        currentY += 8;
+      });
       
-      currentY += 8;
-    });
-    
-    currentY += 5;
+      currentY += 5;
+    }
   });
 
   // Clinical Interpretation
@@ -302,13 +309,13 @@ export function generateVetReportPDF(
     currentY += 8;
   });
 
-  // Clinical Notes - only include if enabled and has content
-  if (report.clinicalNotesEnabled && report.clinicalNotes) {
+  // Clinical Notes - only include if enabled and has meaningful content
+  if (report.clinicalNotesEnabled && report.clinicalNotes && report.clinicalNotes.trim() !== "") {
     checkPageBreak(30);
     addText("CLINICAL NOTES", 20, currentY, { fontSize: 12, fontStyle: "bold" });
     currentY += 10;
     
-    const notesLines = pdf.splitTextToSize(report.clinicalNotes || "", pageWidth - 50);
+    const notesLines = pdf.splitTextToSize(report.clinicalNotes.trim(), pageWidth - 50);
     if (notesLines && notesLines.length > 0) {
       notesLines.forEach((line: string) => {
         checkPageBreak(8);
