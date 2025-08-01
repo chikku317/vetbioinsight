@@ -70,9 +70,9 @@ export function generateVetReportPDF(
   // Table headers and data
   const tableData = [
     ["Patient Name:", report.patientName, "Species/Breed:", `${report.species.charAt(0).toUpperCase() + report.species.slice(1)}${report.breed ? ` / ${report.breed}` : ""}`],
-    ["Age/Weight:", `${report.age} ${report.ageUnit} / ${report.weight} ${report.weightUnit}`, "Medical Record:", report.medicalRecordNumber || "N/A"],
-    ["Collection Date:", report.collectionDate, "Report Date:", report.reportDate],
-    ["Veterinarian:", report.attendingVeterinarian, "Laboratory:", report.laboratoryName || "VetLab Diagnostics"]
+    ["Parents Name:", report.parentsName || "N/A", "Medical Record:", report.medicalRecordNumber || "N/A"],
+    ["Age/Weight:", `${report.age} ${report.ageUnit} / ${report.weight} ${report.weightUnit}`, "Collection Date:", report.collectionDate],
+    ["Veterinarian:", report.attendingVeterinarian, "Report Date:", report.reportDate]
   ];
 
   tableData.forEach(row => {
@@ -272,8 +272,8 @@ export function generateVetReportPDF(
     currentY += 8;
   });
 
-  // Clinical Notes
-  if (report.clinicalNotes) {
+  // Clinical Notes - only include if enabled and has content
+  if (report.clinicalNotesEnabled && report.clinicalNotes) {
     checkPageBreak(30);
     addText("CLINICAL NOTES", 20, currentY, { fontSize: 12, fontStyle: "bold" });
     currentY += 10;

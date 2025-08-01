@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { UseFormReturn } from "react-hook-form";
 import { InsertVetReport, TestResults, Species } from "@shared/schema";
 import { referenceRanges, getTestStatus, getStatusColor, getStatusLabel } from "@/lib/reference-ranges";
@@ -292,35 +293,62 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
       {/* Clinical Notes Panel */}
       <Card>
         <CardHeader className="border-b border-gray-200">
-          <CardTitle className="flex items-center text-lg">
-            <FileText className="text-medical-blue mr-2 h-5 w-5" />
-            Clinical Notes
+          <CardTitle className="flex items-center justify-between text-lg">
+            <div className="flex items-center">
+              <FileText className="text-medical-blue mr-2 h-5 w-5" />
+              Clinical Notes
+            </div>
+            <FormField
+              control={form.control}
+              name="clinicalNotesEnabled"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="text-sm font-normal cursor-pointer">
+                    Enable Clinical Notes
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
           </CardTitle>
-          <p className="text-sm text-medical-gray mt-1">Additional veterinarian observations and comments</p>
+          <p className="text-sm text-medical-gray mt-1">Additional veterinarian observations and comments (optional)</p>
         </CardHeader>
         <CardContent className="p-6">
-          <FormField
-            control={form.control}
-            name="clinicalNotes"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea
-                    className="resize-none"
-                    rows={6}
-                    placeholder="Enter clinical observations, differential diagnoses, recommendations for follow-up testing, treatment notes, or other relevant clinical information..."
-                    {...field}
-                  />
-                </FormControl>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-xs text-medical-gray">
-                    Character count: {field.value?.length || 0}/2000
-                  </span>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {form.watch("clinicalNotesEnabled") && (
+            <FormField
+              control={form.control}
+              name="clinicalNotes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Textarea
+                      className="resize-none"
+                      rows={6}
+                      placeholder="Enter clinical observations, differential diagnoses, recommendations for follow-up testing, treatment notes, or other relevant clinical information..."
+                      {...field}
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-medical-gray">
+                      Character count: {field.value?.length || 0}/2000
+                    </span>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          {!form.watch("clinicalNotesEnabled") && (
+            <div className="text-sm text-medical-gray italic">
+              Clinical notes are disabled. Enable the checkbox above to add clinical observations.
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

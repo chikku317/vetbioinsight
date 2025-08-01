@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { UseFormReturn } from "react-hook-form";
 import { InsertVetReport, speciesOptions } from "@shared/schema";
-import { PawPrint, Building } from "lucide-react";
+import { PawPrint } from "lucide-react";
 
 interface PatientInfoPanelProps {
   form: UseFormReturn<InsertVetReport>;
@@ -31,6 +31,20 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
                 <FormLabel>Patient Name</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter patient name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="parentsName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Parents Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter owner/parents name" {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -70,7 +84,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
                 <FormItem>
                   <FormLabel>Breed</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter breed" {...field} />
+                    <Input placeholder="Enter breed" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -175,7 +189,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
               <FormItem>
                 <FormLabel>Medical Record Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="MRN-2024-001" {...field} />
+                  <Input placeholder="MRN-2024-001" {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -228,64 +242,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
         </CardContent>
       </Card>
 
-      {/* Laboratory Information */}
-      <Card>
-        <CardHeader className="border-b border-gray-200">
-          <CardTitle className="flex items-center text-lg">
-            <Building className="text-medical-blue mr-2 h-5 w-5" />
-            Laboratory Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 space-y-4">
-          <FormField
-            control={form.control}
-            name="laboratoryName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Laboratory Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="VetLab Diagnostics" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="testMethod"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Test Method/Analyzer</FormLabel>
-                <FormControl>
-                  <Input placeholder="Beckman Coulter AU480" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="qualityControlApproved"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>
-                    Results reviewed and approved
-                  </FormLabel>
-                </div>
-              </FormItem>
-            )}
-          />
-        </CardContent>
-      </Card>
+
     </div>
   );
 }

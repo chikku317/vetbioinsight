@@ -6,6 +6,7 @@ import { z } from "zod";
 export const vetReports = pgTable("vet_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   patientName: text("patient_name").notNull(),
+  parentsName: text("parents_name"),
   species: text("species").notNull(),
   breed: text("breed"),
   age: decimal("age").notNull(),
@@ -17,16 +18,12 @@ export const vetReports = pgTable("vet_reports", {
   reportDate: date("report_date").notNull(),
   attendingVeterinarian: text("attending_veterinarian").notNull(),
   
-  // Laboratory Information
-  laboratoryName: text("laboratory_name"),
-  testMethod: text("test_method"),
-  qualityControlApproved: boolean("quality_control_approved").default(false),
-  
   // Test Results stored as JSON for flexibility
   testResults: jsonb("test_results").notNull(),
   
-  // Clinical Notes
+  // Clinical Notes - optional
   clinicalNotes: text("clinical_notes"),
+  clinicalNotesEnabled: boolean("clinical_notes_enabled").default(false),
   
   // Report metadata
   createdAt: date("created_at").default(sql`CURRENT_DATE`),
@@ -68,6 +65,11 @@ export const insertVetReportSchema = createInsertSchema(vetReports).omit({
   createdAt: true,
 }).extend({
   testResults: testResultsSchema,
+  breed: z.string().optional().nullable(),
+  parentsName: z.string().optional().nullable(),
+  medicalRecordNumber: z.string().optional().nullable(),
+  clinicalNotes: z.string().optional().nullable(),
+  clinicalNotesEnabled: z.boolean().default(false),
 });
 
 export type InsertVetReport = z.infer<typeof insertVetReportSchema>;

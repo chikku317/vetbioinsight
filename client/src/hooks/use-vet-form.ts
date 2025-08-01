@@ -14,6 +14,7 @@ export function useVetForm() {
     resolver: zodResolver(insertVetReportSchema),
     defaultValues: {
       patientName: "",
+      parentsName: "",
       species: "dog",
       breed: "",
       age: "0",
@@ -24,11 +25,9 @@ export function useVetForm() {
       collectionDate: new Date().toISOString().split('T')[0],
       reportDate: new Date().toISOString().split('T')[0],
       attendingVeterinarian: "",
-      laboratoryName: "VetLab Diagnostics",
-      testMethod: "",
-      qualityControlApproved: false,
       testResults: {},
       clinicalNotes: "",
+      clinicalNotesEnabled: false,
     },
   });
 
