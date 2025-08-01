@@ -50,38 +50,45 @@ export function generateVetReportPDF(
   // Header - ThePetNest Clinic Header
   // Dark blue background bar
   pdf.setFillColor(52, 73, 151); // Dark blue color matching the header
-  pdf.rect(0, 0, pageWidth, 40, "F");
+  pdf.rect(0, 0, pageWidth, 50, "F");
   
-  // Orange accent elements
-  pdf.setFillColor(255, 165, 0); // Orange color
-  pdf.ellipse(pageWidth - 30, 20, 25, 25, "F");
+  // Orange accent (simplified as rectangle for PDF compatibility)
+  pdf.setFillColor(255, 140, 0); // Orange color
+  // Create triangular shape using polygon points
+  const trianglePoints = [
+    [pageWidth - 40, 0],
+    [pageWidth, 0], 
+    [pageWidth, 50]
+  ];
+  pdf.path()
+    .moveTo(trianglePoints[0][0], trianglePoints[0][1])
+    .lineTo(trianglePoints[1][0], trianglePoints[1][1])
+    .lineTo(trianglePoints[2][0], trianglePoints[2][1])
+    .close()
+    .fill();
   
   // White text on dark background
   pdf.setTextColor(255, 255, 255);
-  addText("ThePetNest", 20, 15, { fontSize: 20, fontStyle: "bold" });
-  addText("PET STORE | LAB | SPA | CLINIC", 20, 25, { fontSize: 10 });
+  addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
+  addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
   
-  // Malayalam text (approximation)
-  addText("താനെപ്പെട്ട് നെസ്റ്റ്", 20, 32, { fontSize: 12 });
+  // Contact information aligned to right
+  addText("8848216190 | 8590433937", pageWidth - 20, 18, { align: "right", fontSize: 12, fontStyle: "bold" });
   
-  // Contact information
-  addText("8848216190 | 8590433937", pageWidth - 20, 15, { align: "right", fontSize: 12, fontStyle: "bold" });
-  
-  // Address
-  pdf.setTextColor(255, 255, 255);
-  addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 45, { fontSize: 8 });
-  addText("support.trivandrum@thepetnest.com", 20, 52, { fontSize: 8 });
+  // Address information
+  addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
+  addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
   
   // Reset text color and set current position
   pdf.setTextColor(0, 0, 0);
-  currentY = 65;
+  currentY = 70;
   
   // Report title
-  addText("VETERINARY BIOCHEMISTRY ANALYSIS REPORT", 20, currentY, { fontSize: 14, fontStyle: "bold", align: "center" });
-  addText(`Report ID: TPN-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`, pageWidth - 20, currentY, { align: "right", fontSize: 10 });
-  currentY += 8;
+  addText("VETERINARY BIOCHEMISTRY ANALYSIS REPORT", pageWidth / 2, currentY, { fontSize: 16, fontStyle: "bold", align: "center" });
+  currentY += 10;
   
-  addText(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - 20, currentY, { align: "right", fontSize: 10 });
+  addText(`Report ID: TPN-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`, pageWidth - 20, currentY, { align: "right", fontSize: 10 });
+  addText(`Generated: ${new Date().toLocaleDateString()}`, 20, currentY, { fontSize: 10 });
   currentY += 15;
 
   // Patient Information Table
@@ -96,65 +103,52 @@ export function generateVetReportPDF(
     ["Veterinarian:", report.attendingVeterinarian, "Report Date:", report.reportDate]
   ];
 
-  // Draw table with better alignment
-  pdf.setDrawColor(180, 180, 180);
+  // Draw table with better alignment (simple clean table)
+  pdf.setDrawColor(100, 100, 100);
   pdf.setLineWidth(0.5);
+  
+  // Table top border
+  addLine(20, currentY - 5, pageWidth - 20, currentY - 5);
   
   tableData.forEach((row, index) => {
     checkPageBreak(15);
     
-    // Alternating row colors for better readability
-    if (index % 2 === 0) {
-      pdf.setFillColor(248, 249, 250);
-      pdf.rect(20, currentY - 8, pageWidth - 40, 12, "F");
-    }
-    
-    // Draw horizontal lines
-    addLine(20, currentY - 8, pageWidth - 20, currentY - 8);
-    
-    // Better column alignment
+    // Clean table rows without background colors
     addText(row[0], 25, currentY, { fontStyle: "bold", fontSize: 10 });
-    addText(row[1], 70, currentY, { fontSize: 10 });
-    addText(row[2], pageWidth/2 + 10, currentY, { fontStyle: "bold", fontSize: 10 });
-    addText(row[3], pageWidth/2 + 60, currentY, { fontSize: 10 });
+    addText(row[1], 90, currentY, { fontSize: 10 });
+    addText(row[2], 120, currentY, { fontStyle: "bold", fontSize: 10 });
+    addText(row[3], 160, currentY, { fontSize: 10 });
     
-    // Vertical dividers
-    addLine(pageWidth/2, currentY - 8, pageWidth/2, currentY + 4);
+    // Horizontal line after each row
+    addLine(20, currentY + 5, pageWidth - 20, currentY + 5);
     
     currentY += 12;
   });
 
-  // Bottom border
-  addLine(20, currentY - 8, pageWidth - 20, currentY - 8);
-  currentY += 15;
+  currentY += 10;
 
   // Test Results Table
   checkPageBreak(40);
   addText("LABORATORY RESULTS", 20, currentY, { fontSize: 14, fontStyle: "bold" });
   currentY += 10;
 
-  // Table headers with better layout
-  pdf.setFillColor(52, 73, 151); // ThePetNest dark blue
-  pdf.rect(20, currentY - 5, pageWidth - 40, 15, "F");
-  
-  // Draw header borders
-  pdf.setDrawColor(255, 255, 255);
+  // Simple clean table headers
+  pdf.setDrawColor(100, 100, 100);
   pdf.setLineWidth(0.5);
-  addLine(80, currentY - 5, 80, currentY + 10); // After Test Parameter
-  addLine(110, currentY - 5, 110, currentY + 10); // After Result
-  addLine(130, currentY - 5, 130, currentY + 10); // After Units
-  addLine(160, currentY - 5, 160, currentY + 10); // After Reference Range
   
-  pdf.setTextColor(255, 255, 255); // white text
-  addText("Test Parameter", 25, currentY + 5, { fontSize: 10, fontStyle: "bold" });
-  addText("Result", 95, currentY + 5, { fontSize: 10, fontStyle: "bold", align: "center" });
-  addText("Units", 120, currentY + 5, { fontSize: 10, fontStyle: "bold", align: "center" });
-  addText("Reference Range", 145, currentY + 5, { fontSize: 10, fontStyle: "bold", align: "center" });
-  addText("Status", 170, currentY + 5, { fontSize: 10, fontStyle: "bold", align: "center" });
+  // Table header border
+  addLine(20, currentY - 5, pageWidth - 20, currentY - 5);
   
-  pdf.setTextColor(0, 0, 0); // reset to black
-  pdf.setDrawColor(180, 180, 180); // reset border color
-  currentY += 20;
+  // Header text (black text, no background)
+  addText("Test Parameter", 25, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Result", 90, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Units", 120, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Reference Range", 140, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Status", 170, currentY, { fontSize: 11, fontStyle: "bold" });
+  
+  // Header bottom border
+  addLine(20, currentY + 5, pageWidth - 20, currentY + 5);
+  currentY += 15;
 
   const ranges = referenceRanges[report.species as Species];
   const testResults = report.testResults as TestResults;
@@ -209,11 +203,10 @@ export function generateVetReportPDF(
   testPanels.forEach(panel => {
     checkPageBreak(25 + panel.tests.length * 8);
     
-    // Panel header
-    pdf.setFillColor(59, 130, 246, 0.1); // light blue
-    pdf.rect(20, currentY - 5, pageWidth - 40, 10, "F");
-    addText(panel.name, 25, currentY, { fontSize: 10, fontStyle: "bold" });
-    currentY += 12;
+    // Panel header (clean, no background)
+    addText(panel.name, 25, currentY, { fontSize: 12, fontStyle: "bold" });
+    addLine(20, currentY + 3, pageWidth - 20, currentY + 3);
+    currentY += 15;
 
     panel.tests.forEach(test => {
       const value = testResults[test.key as keyof TestResults];
@@ -223,17 +216,7 @@ export function generateVetReportPDF(
         const status = getTestStatus(numericValue, test.range);
         const statusLabel = getStatusLabel(status);
         
-        // Highlight abnormal values
-        if (status !== "normal") {
-          if (status === "critical") {
-            pdf.setFillColor(220, 38, 38, 0.1); // red
-          } else {
-            pdf.setFillColor(245, 158, 11, 0.1); // yellow
-          }
-          pdf.rect(20, currentY - 6, pageWidth - 40, 8, "F");
-        }
-
-        // Draw row borders for better table structure
+        // Draw row borders for better table structure (removed background colors)
         pdf.setDrawColor(200, 200, 200);
         addLine(20, currentY + 2, pageWidth - 20, currentY + 2);
         
@@ -285,11 +268,10 @@ export function generateVetReportPDF(
   const interpretations = generateClinicalInterpretations(testResults, report.species as Species);
   const overallAssessment = generateOverallAssessment(interpretations);
 
-  // Overall Assessment
-  pdf.setFillColor(59, 130, 246, 0.1);
-  pdf.rect(20, currentY - 5, pageWidth - 40, 20, "F");
-  addText("Overall Assessment:", 25, currentY, { fontSize: 11, fontStyle: "bold" });
-  currentY += 8;
+  // Overall Assessment (clean, no background)
+  addText("OVERALL ASSESSMENT:", 20, currentY, { fontSize: 12, fontStyle: "bold" });
+  addLine(20, currentY + 3, pageWidth - 20, currentY + 3);
+  currentY += 10;
   
   const assessmentLines = pdf.splitTextToSize(overallAssessment, pageWidth - 50);
   assessmentLines.forEach((line: string) => {
@@ -303,21 +285,9 @@ export function generateVetReportPDF(
   interpretations.forEach(interpretation => {
     checkPageBreak(30);
     
-    let severityColor: [number, number, number, number];
-    if (interpretation.severity === "severe") {
-      severityColor = [220, 38, 38, 0.1];
-    } else if (interpretation.severity === "moderate") {
-      severityColor = [245, 158, 11, 0.1];
-    } else if (interpretation.severity === "mild") {
-      severityColor = [253, 224, 71, 0.1];
-    } else {
-      severityColor = [34, 197, 94, 0.1];
-    }
-    
-    pdf.setFillColor(severityColor[0], severityColor[1], severityColor[2], severityColor[3]);
-    pdf.rect(20, currentY - 5, pageWidth - 40, 8, "F");
+    // Panel interpretation header (clean, no background)
     addText(`${interpretation.panel}:`, 25, currentY, { fontSize: 11, fontStyle: "bold" });
-    currentY += 10;
+    currentY += 8;
 
     interpretation.findings.forEach(finding => {
       const findingLines = pdf.splitTextToSize(`• ${finding}`, pageWidth - 50);
