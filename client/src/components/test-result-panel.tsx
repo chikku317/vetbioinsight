@@ -31,8 +31,8 @@ function TestField({ form, testKey, label, unit, species, step = "1", className 
   const testValue = form.watch(`testResults.${testKey}`);
   
   let status: "normal" | "high" | "low" | "critical" = "normal";
-  if (testValue !== undefined && testValue !== null && testValue !== "") {
-    status = getTestStatus(Number(testValue), range);
+  if (typeof testValue === 'number' && !isNaN(testValue)) {
+    status = getTestStatus(testValue, range);
   }
 
   const statusColor = getStatusColor(status);
@@ -42,7 +42,7 @@ function TestField({ form, testKey, label, unit, species, step = "1", className 
     <div className={`bg-gray-50 rounded-lg p-4 ${className}`}>
       <div className="flex items-center justify-between mb-2">
         <FormLabel className="text-sm font-medium text-gray-700">{label}</FormLabel>
-        {testValue !== undefined && testValue !== null && testValue !== "" && (
+        {typeof testValue === 'number' && !isNaN(testValue) && (
           <Badge className={`px-2 py-1 text-xs rounded-full ${statusColor}`}>
             {statusLabel}
           </Badge>
@@ -60,7 +60,7 @@ function TestField({ form, testKey, label, unit, species, step = "1", className 
                   type="number"
                   step={step}
                   placeholder={range.min.toString()}
-                  className={testValue !== undefined && testValue !== null && testValue !== "" && status !== "normal" 
+                  className={typeof testValue === 'number' && !isNaN(testValue) && status !== "normal" 
                     ? status === "critical" ? "border-red-300 focus:ring-error-red" : "border-yellow-300 focus:ring-warning-yellow"
                     : ""
                   }
