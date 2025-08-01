@@ -81,8 +81,8 @@ export function generateVetReportPDF(
   currentY += 15;
 
   // Patient Information Table
-  addText("PATIENT INFORMATION", 20, currentY, { fontSize: 14, fontStyle: "bold" });
-  currentY += 10;
+  addText("PATIENT INFORMATION", 20, currentY, { fontSize: 12, fontStyle: "bold" });
+  currentY += 8;
 
   // Patient Information Table with better alignment
   const tableData = [
@@ -111,15 +111,15 @@ export function generateVetReportPDF(
     // Horizontal line after each row
     addLine(20, currentY + 5, pageWidth - 20, currentY + 5);
     
-    currentY += 12;
+    currentY += 10;
   });
 
-  currentY += 10;
+  currentY += 8;
 
   // Test Results Table
   checkPageBreak(40);
-  addText("LABORATORY RESULTS", 20, currentY, { fontSize: 14, fontStyle: "bold" });
-  currentY += 10;
+  addText("LABORATORY RESULTS", 20, currentY, { fontSize: 12, fontStyle: "bold" });
+  currentY += 8;
 
   // Simple clean table headers
   pdf.setDrawColor(100, 100, 100);
@@ -233,94 +233,31 @@ export function generateVetReportPDF(
           fontStyle: status !== "normal" ? "bold" : "normal"
         });
         
-        currentY += 8;
+        currentY += 6;
       });
       
-      currentY += 5;
-    }
-  });
-
-  // Clinical Interpretation
-  checkPageBreak(50);
-  currentY += 10;
-  addText("CLINICAL INTERPRETATION", 20, currentY, { fontSize: 14, fontStyle: "bold" });
-  currentY += 10;
-
-  const interpretations = generateClinicalInterpretations(testResults, report.species as Species);
-  const overallAssessment = generateOverallAssessment(interpretations);
-
-  // Overall Assessment (clean, no background)
-  addText("OVERALL ASSESSMENT:", 20, currentY, { fontSize: 12, fontStyle: "bold" });
-  addLine(20, currentY + 3, pageWidth - 20, currentY + 3);
-  currentY += 10;
-  
-  const assessmentLines = pdf.splitTextToSize(overallAssessment || "", pageWidth - 50);
-  if (assessmentLines && assessmentLines.length > 0) {
-    assessmentLines.forEach((line: string) => {
-      addText(line, 25, currentY, { fontSize: 10 });
-      currentY += 6;
-    });
-  }
-  
-  currentY += 10;
-
-  // Panel Interpretations
-  interpretations.forEach(interpretation => {
-    checkPageBreak(30);
-    
-    // Panel interpretation header (clean, no background)
-    addText(`${interpretation.panel}:`, 25, currentY, { fontSize: 11, fontStyle: "bold" });
-    currentY += 8;
-
-    if (interpretation.findings && interpretation.findings.length > 0) {
-      interpretation.findings.forEach(finding => {
-        const findingLines = pdf.splitTextToSize(`• ${finding}`, pageWidth - 50);
-        if (findingLines && findingLines.length > 0) {
-          findingLines.forEach((line: string) => {
-            checkPageBreak(8);
-            addText(line, 30, currentY, { fontSize: 9 });
-            currentY += 6;
-          });
-        }
-      });
-    }
-
-    if (interpretation.recommendations && interpretation.recommendations.length > 0) {
       currentY += 3;
-      addText("Recommendations:", 30, currentY, { fontSize: 10, fontStyle: "bold" });
-      currentY += 7;
-      
-      interpretation.recommendations.forEach(rec => {
-        const recLines = pdf.splitTextToSize(`• ${rec}`, pageWidth - 55);
-        if (recLines && recLines.length > 0) {
-          recLines.forEach((line: string) => {
-            checkPageBreak(8);
-            addText(line, 35, currentY, { fontSize: 9 });
-            currentY += 6;
-          });
-        }
-      });
     }
-    
-    currentY += 8;
   });
+
+  // Skip clinical interpretations to keep report concise
 
   // Clinical Notes - only include if enabled and has meaningful content
   if (report.clinicalNotesEnabled && report.clinicalNotes && report.clinicalNotes.trim() !== "") {
     checkPageBreak(30);
-    addText("CLINICAL NOTES", 20, currentY, { fontSize: 12, fontStyle: "bold" });
-    currentY += 10;
+    addText("CLINICAL NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
+    currentY += 8;
     
     const notesLines = pdf.splitTextToSize(report.clinicalNotes.trim(), pageWidth - 50);
     if (notesLines && notesLines.length > 0) {
       notesLines.forEach((line: string) => {
-        checkPageBreak(8);
-        addText(line, 25, currentY, { fontSize: 10 });
-        currentY += 6;
+        checkPageBreak(6);
+        addText(line, 25, currentY, { fontSize: 9 });
+        currentY += 4;
       });
     }
     
-    currentY += 15;
+    currentY += 6;
   }
 
   // Footer - ThePetNest signature
