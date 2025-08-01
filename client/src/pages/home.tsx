@@ -29,7 +29,8 @@ export default function Home() {
   const handleGeneratePDF = () => {
     const tempReport = createTempReport();
     const pdf = generateVetReportPDF(tempReport);
-    pdf.save(`VetLab_Report_${tempReport.patientName || "Patient"}_${tempReport.reportDate}.pdf`);
+    const filename = `BIOCHEMISTRY ANALYSIS REPORT_${tempReport.patientName || 'Patient'}_${tempReport.parentsName || 'Owner'}_${tempReport.collectionDate || tempReport.reportDate}.pdf`;
+    pdf.save(filename);
   };
 
   const abnormalCount = getAbnormalTestCount();

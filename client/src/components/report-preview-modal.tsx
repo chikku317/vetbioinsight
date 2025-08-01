@@ -18,7 +18,8 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
   const handleDownloadPDF = () => {
     try {
       const pdf = generateVetReportPDF(report);
-      pdf.save(`ThePetNest_Report_${report.patientName}_${report.reportDate}.pdf`);
+      const filename = `BIOCHEMISTRY ANALYSIS REPORT_${report.patientName || 'Patient'}_${report.parentsName || 'Owner'}_${report.collectionDate || report.reportDate}.pdf`;
+      pdf.save(filename);
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Error generating PDF. Please try again.");
