@@ -54,18 +54,7 @@ export function generateVetReportPDF(
   
   // Orange accent (simplified as rectangle for PDF compatibility)
   pdf.setFillColor(255, 140, 0); // Orange color
-  // Create triangular shape using polygon points
-  const trianglePoints = [
-    [pageWidth - 40, 0],
-    [pageWidth, 0], 
-    [pageWidth, 50]
-  ];
-  pdf.path()
-    .moveTo(trianglePoints[0][0], trianglePoints[0][1])
-    .lineTo(trianglePoints[1][0], trianglePoints[1][1])
-    .lineTo(trianglePoints[2][0], trianglePoints[2][1])
-    .close()
-    .fill();
+  pdf.rect(pageWidth - 40, 0, 40, 50, "F"); // Simple rectangle instead of triangle
   
   // White text on dark background
   pdf.setTextColor(255, 255, 255);
@@ -273,11 +262,13 @@ export function generateVetReportPDF(
   addLine(20, currentY + 3, pageWidth - 20, currentY + 3);
   currentY += 10;
   
-  const assessmentLines = pdf.splitTextToSize(overallAssessment, pageWidth - 50);
-  assessmentLines.forEach((line: string) => {
-    addText(line, 25, currentY, { fontSize: 10 });
-    currentY += 6;
-  });
+  const assessmentLines = pdf.splitTextToSize(overallAssessment || "", pageWidth - 50);
+  if (assessmentLines && assessmentLines.length > 0) {
+    assessmentLines.forEach((line: string) => {
+      addText(line, 25, currentY, { fontSize: 10 });
+      currentY += 6;
+    });
+  }
   
   currentY += 10;
 
@@ -289,27 +280,33 @@ export function generateVetReportPDF(
     addText(`${interpretation.panel}:`, 25, currentY, { fontSize: 11, fontStyle: "bold" });
     currentY += 8;
 
-    interpretation.findings.forEach(finding => {
-      const findingLines = pdf.splitTextToSize(`• ${finding}`, pageWidth - 50);
-      findingLines.forEach((line: string) => {
-        checkPageBreak(8);
-        addText(line, 30, currentY, { fontSize: 9 });
-        currentY += 6;
+    if (interpretation.findings && interpretation.findings.length > 0) {
+      interpretation.findings.forEach(finding => {
+        const findingLines = pdf.splitTextToSize(`• ${finding}`, pageWidth - 50);
+        if (findingLines && findingLines.length > 0) {
+          findingLines.forEach((line: string) => {
+            checkPageBreak(8);
+            addText(line, 30, currentY, { fontSize: 9 });
+            currentY += 6;
+          });
+        }
       });
-    });
+    }
 
-    if (interpretation.recommendations.length > 0) {
+    if (interpretation.recommendations && interpretation.recommendations.length > 0) {
       currentY += 3;
       addText("Recommendations:", 30, currentY, { fontSize: 10, fontStyle: "bold" });
       currentY += 7;
       
       interpretation.recommendations.forEach(rec => {
         const recLines = pdf.splitTextToSize(`• ${rec}`, pageWidth - 55);
-        recLines.forEach((line: string) => {
-          checkPageBreak(8);
-          addText(line, 35, currentY, { fontSize: 9 });
-          currentY += 6;
-        });
+        if (recLines && recLines.length > 0) {
+          recLines.forEach((line: string) => {
+            checkPageBreak(8);
+            addText(line, 35, currentY, { fontSize: 9 });
+            currentY += 6;
+          });
+        }
       });
     }
     
@@ -322,12 +319,14 @@ export function generateVetReportPDF(
     addText("CLINICAL NOTES", 20, currentY, { fontSize: 12, fontStyle: "bold" });
     currentY += 10;
     
-    const notesLines = pdf.splitTextToSize(report.clinicalNotes, pageWidth - 50);
-    notesLines.forEach((line: string) => {
-      checkPageBreak(8);
-      addText(line, 25, currentY, { fontSize: 10 });
-      currentY += 6;
-    });
+    const notesLines = pdf.splitTextToSize(report.clinicalNotes || "", pageWidth - 50);
+    if (notesLines && notesLines.length > 0) {
+      notesLines.forEach((line: string) => {
+        checkPageBreak(8);
+        addText(line, 25, currentY, { fontSize: 10 });
+        currentY += 6;
+      });
+    }
     
     currentY += 15;
   }
