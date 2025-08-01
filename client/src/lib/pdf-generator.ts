@@ -41,9 +41,9 @@ export function generateVetReportPDF(
   };
 
   const checkPageBreak = (requiredSpace: number) => {
-    if (currentY + requiredSpace > pageHeight - 20) {
+    if (currentY + requiredSpace > pageHeight - 50) {
       pdf.addPage();
-      currentY = 20;
+      currentY = 30; // More space from top on new pages
     }
   };
 
@@ -128,10 +128,10 @@ export function generateVetReportPDF(
   // Table header border
   addLine(20, currentY - 5, pageWidth - 20, currentY - 5);
   
-  // Header text (black text, no background)
+  // Header text aligned with data columns
   addText("Test Parameter", 25, currentY, { fontSize: 11, fontStyle: "bold" });
-  addText("Result", 90, currentY, { fontSize: 11, fontStyle: "bold" });
-  addText("Units", 120, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Result", 85, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Units", 115, currentY, { fontSize: 11, fontStyle: "bold" });
   addText("Reference Range", 140, currentY, { fontSize: 11, fontStyle: "bold" });
   addText("Status", 170, currentY, { fontSize: 11, fontStyle: "bold" });
   
@@ -209,37 +209,26 @@ export function generateVetReportPDF(
         pdf.setDrawColor(200, 200, 200);
         addLine(20, currentY + 2, pageWidth - 20, currentY + 2);
         
+        // Better text placement to avoid overlap
         addText(test.name, 25, currentY, { fontSize: 9 });
-        addText(numericValue.toString(), 95, currentY, { fontSize: 9, align: "center" });
-        addText(test.range.unit, 120, currentY, { fontSize: 9, align: "center" });
-        addText(`${test.range.min}-${test.range.max}`, 145, currentY, { fontSize: 9, align: "center" });
+        addText(numericValue.toString(), 85, currentY, { fontSize: 9 });
+        addText(test.range.unit, 115, currentY, { fontSize: 9 });
+        addText(`${test.range.min}-${test.range.max}`, 140, currentY, { fontSize: 9 });
         addText(statusLabel, 170, currentY, { 
-          fontSize: 9, 
-          align: "center",
+          fontSize: 9,
           fontStyle: status !== "normal" ? "bold" : "normal"
         });
-        
-        // Draw vertical separators
-        addLine(80, currentY - 4, 80, currentY + 2);
-        addLine(110, currentY - 4, 110, currentY + 2);
-        addLine(130, currentY - 4, 130, currentY + 2);
-        addLine(160, currentY - 4, 160, currentY + 2);
       } else {
         // Draw row borders for better table structure
         pdf.setDrawColor(200, 200, 200);
         addLine(20, currentY + 2, pageWidth - 20, currentY + 2);
         
+        // Better text placement for "Not Tested" entries
         addText(test.name, 25, currentY, { fontSize: 9 });
-        addText("Not Tested", 95, currentY, { fontSize: 9, align: "center" });
-        addText(test.range.unit, 120, currentY, { fontSize: 9, align: "center" });
-        addText(`${test.range.min}-${test.range.max}`, 145, currentY, { fontSize: 9, align: "center" });
-        addText("-", 170, currentY, { fontSize: 9, align: "center" });
-        
-        // Draw vertical separators
-        addLine(80, currentY - 4, 80, currentY + 2);
-        addLine(110, currentY - 4, 110, currentY + 2);
-        addLine(130, currentY - 4, 130, currentY + 2);
-        addLine(160, currentY - 4, 160, currentY + 2);
+        addText("Not Tested", 85, currentY, { fontSize: 9 });
+        addText(test.range.unit, 115, currentY, { fontSize: 9 });
+        addText(`${test.range.min}-${test.range.max}`, 140, currentY, { fontSize: 9 });
+        addText("-", 170, currentY, { fontSize: 9 });
       }
       
       currentY += 8;
@@ -331,24 +320,24 @@ export function generateVetReportPDF(
     currentY += 15;
   }
 
-  // Footer
+  // Footer - ThePetNest signature
   checkPageBreak(40);
-  currentY = Math.max(currentY, pageHeight - 60);
+  currentY = Math.max(currentY, pageHeight - 50);
   
   addLine(20, currentY, pageWidth - 20, currentY);
   currentY += 10;
 
-  addText("VetLab Diagnostics", 20, currentY, { fontSize: 10, fontStyle: "bold" });
+  addText("ThePetNest Veterinary Services", 20, currentY, { fontSize: 10, fontStyle: "bold" });
   addText("Reviewed and Approved by:", pageWidth - 20, currentY, { align: "right", fontSize: 10 });
   currentY += 8;
 
-  addText("123 Medical Center Drive, Veterinary Plaza", 20, currentY, { fontSize: 9 });
+  addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, currentY, { fontSize: 9 });
   currentY += 6;
-  addText("Phone: (555) 123-4567 | Email: results@vetlab.com", 20, currentY, { fontSize: 9 });
+  addText("Phone: 8848216190 | Email: support.trivandrum@thepetnest.com", 20, currentY, { fontSize: 9 });
 
   // Signature line
   addLine(pageWidth - 100, currentY + 10, pageWidth - 20, currentY + 10);
-  addText(report.attendingVeterinarian + ", DVM", pageWidth - 20, currentY + 20, { align: "right", fontSize: 9 });
+  addText((report.attendingVeterinarian || "Attending Veterinarian") + ", DVM", pageWidth - 20, currentY + 20, { align: "right", fontSize: 9 });
 
   return pdf;
 }
