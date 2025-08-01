@@ -50,11 +50,10 @@ export function generateVetReportPDF(
 
   // Header - ThePetNest professional header using provided image
   try {
-    // Add the header image at the top of the page
-    // The image should span the full width and maintain proper aspect ratio
-    const headerHeight = 40; // Adjust height as needed for good proportions
+    // Add the header image with proper aspect ratio (original is approximately 900x200px)
+    const headerHeight = 35; // Better proportional height
     pdf.addImage(headerImagePath, 'PNG', 0, 0, pageWidth, headerHeight);
-    currentY = headerHeight + 10; // Set position below header with some spacing
+    currentY = headerHeight + 15; // More spacing below header
   } catch (error) {
     console.warn("Could not load header image, using fallback:", error);
     // Fallback header if image fails to load
@@ -69,7 +68,7 @@ export function generateVetReportPDF(
     addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
     addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
     pdf.setTextColor(0, 0, 0);
-    currentY = 60;
+    currentY = 65;
   }
   
   // Report title
@@ -128,12 +127,12 @@ export function generateVetReportPDF(
   // Table header border
   addLine(20, currentY - 5, pageWidth - 20, currentY - 5);
   
-  // Header text aligned with data columns
+  // Header text aligned with data columns - better spacing
   addText("Test Parameter", 25, currentY, { fontSize: 11, fontStyle: "bold" });
-  addText("Result", 85, currentY, { fontSize: 11, fontStyle: "bold" });
-  addText("Units", 115, currentY, { fontSize: 11, fontStyle: "bold" });
-  addText("Reference Range", 140, currentY, { fontSize: 11, fontStyle: "bold" });
-  addText("Status", 170, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Result", 90, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Units", 120, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Reference Range", 145, currentY, { fontSize: 11, fontStyle: "bold" });
+  addText("Status", 180, currentY, { fontSize: 11, fontStyle: "bold" });
   
   // Header bottom border
   addLine(20, currentY + 5, pageWidth - 20, currentY + 5);
@@ -223,12 +222,12 @@ export function generateVetReportPDF(
         pdf.setDrawColor(200, 200, 200);
         addLine(20, currentY + 2, pageWidth - 20, currentY + 2);
         
-        // Better text placement to avoid overlap
+        // Better text placement with proper column alignment
         addText(test.name, 25, currentY, { fontSize: 9 });
-        addText(numericValue.toString(), 85, currentY, { fontSize: 9 });
-        addText(test.range.unit, 115, currentY, { fontSize: 9 });
-        addText(`${test.range.min}-${test.range.max}`, 140, currentY, { fontSize: 9 });
-        addText(statusLabel, 170, currentY, { 
+        addText(numericValue.toString(), 90, currentY, { fontSize: 9 });
+        addText(test.range.unit, 120, currentY, { fontSize: 9 });
+        addText(`${test.range.min}-${test.range.max}`, 145, currentY, { fontSize: 9 });
+        addText(statusLabel, 180, currentY, { 
           fontSize: 9,
           fontStyle: status !== "normal" ? "bold" : "normal"
         });
@@ -260,24 +259,7 @@ export function generateVetReportPDF(
     currentY += 6;
   }
 
-  // Footer - ThePetNest signature
-  checkPageBreak(40);
-  currentY = Math.max(currentY, pageHeight - 50);
-  
-  addLine(20, currentY, pageWidth - 20, currentY);
-  currentY += 10;
-
-  addText("ThePetNest Veterinary Services", 20, currentY, { fontSize: 10, fontStyle: "bold" });
-  addText("Reviewed and Approved by:", pageWidth - 20, currentY, { align: "right", fontSize: 10 });
-  currentY += 8;
-
-  addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, currentY, { fontSize: 9 });
-  currentY += 6;
-  addText("Phone: 8848216190 | Email: support.trivandrum@thepetnest.com", 20, currentY, { fontSize: 9 });
-
-  // Signature line
-  addLine(pageWidth - 100, currentY + 10, pageWidth - 20, currentY + 10);
-  addText((report.attendingVeterinarian || "Attending Veterinarian") + ", DVM", pageWidth - 20, currentY + 20, { align: "right", fontSize: 9 });
+  // No footer - removed as requested
 
   return pdf;
 }
