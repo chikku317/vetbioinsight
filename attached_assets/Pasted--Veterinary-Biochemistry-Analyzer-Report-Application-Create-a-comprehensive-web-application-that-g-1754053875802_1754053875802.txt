@@ -1,0 +1,119 @@
+# Veterinary Biochemistry Analyzer Report Application
+
+Create a comprehensive web application that generates professional biochemistry analyzer reports for veterinary animals. The application should collect patient information, laboratory test results, and generate a formatted PDF report with interpretations.
+
+## Application Requirements
+
+### 1. Patient Information Section
+Create input fields for:
+- **Patient Name** (text input)
+- **Species** (dropdown: Dog, Cat, Horse, Cattle, Sheep, Goat, Pig, Bird, Rabbit, Other)
+- **Breed** (text input)
+- **Age** (number input with unit selector: years/months/weeks)
+- **Weight** (number input with unit selector: kg/lbs)
+- **Medical Record Number** (text input)
+- **Date of Collection** (date picker)
+- **Date of Report** (date picker, default to today)
+- **Attending Veterinarian** (text input)
+
+### 2. Laboratory Test Results Sections
+
+#### Hepatic (Liver) Function Panel
+- **Alanine Aminotransferase (ALT)** - input field with unit (U/L)
+- **Alkaline Phosphatase (ALP)** - input field with unit (U/L)
+- **Gamma-Glutamyl Transferase (GGT)** - input field with unit (U/L)
+- **Total Bilirubin** - input field with unit (mg/dL or μmol/L)
+
+#### Renal (Kidney) Function Panel
+- **Blood Urea Nitrogen (BUN)** - input field with unit (mg/dL)
+- **Creatinine** - input field with unit (mg/dL)
+
+#### Pancreatic Function Panel
+- **Amylase** - input field with unit (U/L)
+- **Lipase** - input field with unit (U/L)
+
+#### Glucose & Electrolytes Panel
+- **Glucose** - input field with unit (mg/dL)
+- **Sodium (Na+)** - input field with unit (mEq/L)
+- **Potassium (K+)** - input field with unit (mEq/L)
+- **Chloride (Cl-)** - input field with unit (mEq/L)
+
+#### Proteins & Other Panel
+- **Total Protein** - input field with unit (g/dL)
+- **Albumin** - input field with unit (g/dL)
+- **Globulin** - input field with unit (g/dL) - auto-calculated as Total Protein - Albumin
+- **Cholesterol** - input field with unit (mg/dL)
+- **Phosphorus** - input field with unit (mg/dL)
+- **Calcium (Ca++)** - input field with unit (mg/dL)
+
+### 3. Reference Ranges & Interpretation
+Include species-specific reference ranges for each parameter. The application should:
+- Display reference ranges next to each input field
+- Automatically flag abnormal values (High/Low/Critical)
+- Provide color coding (Green: Normal, Yellow: Borderline, Red: Abnormal)
+- Generate automated interpretations based on the provided clinical significance information
+
+### 4. Additional Features
+- **Clinical Notes Section** - Large text area for veterinarian comments
+- **Test Method/Analyzer** - Input field for equipment used
+- **Laboratory Information** - Fields for lab name, address, phone
+- **Quality Control** - Checkbox for "Results reviewed and approved"
+
+### 5. PDF Report Generation
+The PDF report should include:
+- Professional header with laboratory logo placeholder
+- Patient demographics in a clean table format
+- Test results organized by panels with reference ranges
+- Abnormal values clearly highlighted
+- Automated interpretations for each panel
+- Clinical significance explanations
+- Footer with laboratory contact information
+- Digital signature area for the veterinarian
+
+### 6. User Interface Requirements
+- Clean, professional medical interface design
+- Responsive design for desktop and tablet use
+- Form validation to ensure all required fields are completed
+- Save/Load functionality for draft reports
+- Print preview before PDF generation
+- Clear navigation between sections
+- Progress indicator showing completion status
+
+### 7. Technical Specifications
+- Use modern web technologies (HTML5, CSS3, JavaScript)
+- Implement client-side PDF generation (using libraries like jsPDF or Puppeteer)
+- Include proper form validation and error handling
+- Ensure data privacy and security considerations
+- Make the application work offline once loaded
+- Responsive design for various screen sizes
+
+### 8. Reference Ranges by Species
+Include comprehensive reference ranges for common veterinary species:
+- Canine (Dog)
+- Feline (Cat)
+- Equine (Horse)
+- Bovine (Cattle)
+- Ovine (Sheep)
+- Caprine (Goat)
+- Porcine (Pig)
+- Avian (Bird)
+- Lagomorph (Rabbit)
+
+### 9. Clinical Interpretation Engine
+Implement automated interpretation based on:
+- Single parameter abnormalities
+- Pattern recognition (e.g., cholestatic pattern: elevated ALP + GGT)
+- Species-specific considerations
+- Age-related variations
+- Clinical correlations between different parameters
+
+### 10. Report Customization Options
+- Laboratory letterhead upload
+- Custom reference ranges
+- Additional test parameters
+- Veterinarian signature upload
+- Report template selection
+- Language localization options
+
+## Expected Output
+The final application should be a complete, functional veterinary biochemistry report generator that produces professional-quality PDF reports suitable for clinical use, with proper medical formatting and comprehensive interpretations based on the provided clinical guidelines.
