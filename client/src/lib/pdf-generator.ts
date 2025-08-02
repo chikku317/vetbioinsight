@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
+import headerImagePath from "@assets/Lab Header The PetNest_1754069909688.png";
 import { VetReport, TestResults, Species } from "@shared/schema";
 import { referenceRanges, getTestStatus, getStatusLabel } from "./reference-ranges";
 import { generateClinicalInterpretations, generateOverallAssessment } from "./clinical-interpreter";
-import headerImagePath from "@assets/Lab Header The PetNest_1754069909688.png";
 
 export interface PDFGenerationOptions {
   includelogo?: boolean;
