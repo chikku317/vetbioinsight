@@ -252,7 +252,7 @@ export default function Home() {
       species: formData.species as Species,
       breed: formData.breed || null,
       age: formData.age,
-      ageUnit: formData.ageUnit || 'years',
+      ageUnit: (formData.ageUnit || 'years') as string,
       weight: formData.weight,
       weightUnit: formData.weightUnit,
       medicalRecordNumber: formData.medicalRecordNumber || null,

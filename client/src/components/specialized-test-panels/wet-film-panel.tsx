@@ -112,7 +112,7 @@ export function WetFilmPanel({ form }: WetFilmPanelProps) {
           <div className="space-y-3">
             <FormLabel>Specimen Image</FormLabel>
             {!uploadedImage ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors relative">
                 <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                 <p className="text-sm text-gray-600 mb-2">Click to upload specimen image</p>
                 <p className="text-xs text-gray-500">Optimized for maximum clarity</p>
@@ -120,9 +120,9 @@ export function WetFilmPanel({ form }: WetFilmPanelProps) {
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 />
-                <Button type="button" variant="outline" className="mt-2">
+                <Button type="button" variant="outline" className="mt-2 relative z-0">
                   Choose Image
                 </Button>
               </div>
