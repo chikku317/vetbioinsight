@@ -1,8 +1,12 @@
 import jsPDF from "jspdf";
 import { VetReport } from "@shared/schema";
 import headerImagePath from "@assets/The MAin Header_1754116167505.png";
+import { PDFErrorHandler } from "./pdf-error-handler";
 
 export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
+  // Create a safe report with error handling
+  const safeReport = PDFErrorHandler.safeReportValidation(report);
+  
   const pdf = new jsPDF();
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -67,7 +71,7 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
   }
   
   // Report title
-  const reportTitle = getReportTitle(report.reportType);
+  const reportTitle = getReportTitle(safeReport.reportType);
   addText(reportTitle, pageWidth / 2, currentY, { fontSize: 16, fontStyle: "bold", align: "center" });
   currentY += 10;
   
@@ -80,16 +84,16 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
   currentY += 8;
 
   const patientInfo = [
-    [`Patient Name:`, report.patientName || 'N/A'],
-    [`Parent Name:`, report.parentsName || 'N/A'],
-    [`Species:`, report.species && report.species.length > 0 ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : 'N/A'],
-    [`Breed:`, report.breed || 'N/A'],
-    [`Age:`, `${report.age || 'N/A'} ${report.ageUnit || ''}`],
-    [`Weight:`, `${report.weight || 'N/A'} ${report.weightUnit || ''}`],
-    [`Collection Date:`, report.collectionDate || 'N/A'],
-    [`Report Date:`, report.reportDate || 'N/A'],
-    [`Attending Veterinarian:`, report.attendingVeterinarian || 'N/A'],
-    [`Notes:`, (report as any).dogNotes || 'N/A'],
+    [`Patient Name:`, safeReport.patientName],
+    [`Parent Name:`, safeReport.parentsName],
+    [`Species:`, PDFErrorHandler.safeSpeciesFormat(safeReport.species)],
+    [`Breed:`, safeReport.breed || 'N/A'],
+    [`Age:`, `${safeReport.age} ${safeReport.ageUnit}`],
+    [`Weight:`, `${safeReport.weight} ${safeReport.weightUnit}`],
+    [`Collection Date:`, safeReport.collectionDate],
+    [`Report Date:`, safeReport.reportDate],
+    [`Attending Veterinarian:`, safeReport.attendingVeterinarian],
+    [`Notes:`, (safeReport as any).dogNotes || 'N/A'],
   ];
 
   patientInfo.forEach(([label, value]) => {
@@ -127,16 +131,12 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
       addText("DOCTOR NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
       currentY += 8;
       
-      const notesLines = pdf.splitTextToSize(report.notes.trim(), pageWidth - 50);
-      if (Array.isArray(notesLines)) {
-        notesLines.forEach((line: string) => {
-          if (line && typeof line === 'string') {
-            checkPageBreak(6);
-            addText(line, 25, currentY, { fontSize: 10 });
-            currentY += 5;
-          }
-        });
-      }
+      const notesLines = PDFErrorHandler.safeSplitTextToSize(pdf, safeReport.notes, pageWidth - 50);
+      notesLines.forEach((line: string) => {
+        checkPageBreak(6);
+        addText(line, 25, currentY, { fontSize: 10 });
+        currentY += 5;
+      });
       currentY += 5;
     }
 

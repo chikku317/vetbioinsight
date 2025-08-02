@@ -36,7 +36,8 @@ export function WhatsAppShare({ report, trigger }: WhatsAppShareProps) {
       const labTestName = report.reportType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Laboratory Report';
       const parentName = report.parentsName || 'Unknown';
       const patientName = report.patientName || 'Unknown';
-      const currentDate = new Date().toISOString().split('T')[0];
+      const currentDateStr = new Date().toISOString();
+      const currentDate = currentDateStr.includes('T') ? currentDateStr.split('T')[0] : currentDateStr;
       const filename = `${labTestName}_${parentName}_${patientName}_${currentDate}.pdf`;
 
       // Convert PDF to blob

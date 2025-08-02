@@ -1,8 +1,9 @@
 import jsPDF from "jspdf";
 import headerImagePath from "@assets/The MAin Header_1754116167505.png";
 import { VetReport, TestResults, Species } from "@shared/schema";
-import { referenceRanges, getTestStatus, getStatusLabel } from "./reference-ranges";
+import { referenceRanges, getTestStatus, getStatusLabel, SpeciesReferenceRanges } from "./reference-ranges";
 import { generateClinicalInterpretations, generateOverallAssessment } from "./clinical-interpreter";
+import { PDFErrorHandler } from "./pdf-error-handler";
 
 export interface PDFGenerationOptions {
   includelogo?: boolean;
@@ -14,6 +15,9 @@ export function generateVetReportPDF(
   report: VetReport,
   options: PDFGenerationOptions = {}
 ): jsPDF {
+  // Create a safe report with error handling
+  const safeReport = PDFErrorHandler.safeReportValidation(report);
+  
   const pdf = new jsPDF();
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -221,7 +225,7 @@ export function generateVetReportPDF(
       testsWithValues.forEach(test => {
         const value = testResults[test.key as keyof TestResults];
         const numericValue = typeof value === 'number' ? value : Number(value);
-        const status = getTestStatus(numericValue, test.range);
+        const status = getTestStatus(test.key as keyof SpeciesReferenceRanges, numericValue, safeReport.species as Species);
         const statusLabel = getStatusLabel(status);
         
         // Draw row borders for better table structure (removed background colors)
@@ -248,21 +252,17 @@ export function generateVetReportPDF(
   // Skip clinical interpretations to keep report concise
 
   // Clinical Notes - only include if enabled and has meaningful content
-  if (report.clinicalNotesEnabled && report.clinicalNotes && typeof report.clinicalNotes === 'string' && report.clinicalNotes.trim() !== "") {
+  if (safeReport.clinicalNotesEnabled && safeReport.clinicalNotes && typeof safeReport.clinicalNotes === 'string' && safeReport.clinicalNotes.trim() !== "") {
     checkPageBreak(30);
     addText("CLINICAL NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
     currentY += 8;
     
-    const notesLines = pdf.splitTextToSize(report.clinicalNotes.trim(), pageWidth - 50);
-    if (Array.isArray(notesLines) && notesLines.length > 0) {
-      notesLines.forEach((line: string) => {
-        if (line && typeof line === 'string') {
-          checkPageBreak(6);
-          addText(line, 25, currentY, { fontSize: 9 });
-          currentY += 4;
-        }
-      });
-    }
+    const notesLines = PDFErrorHandler.safeSplitTextToSize(pdf, safeReport.clinicalNotes, pageWidth - 50);
+    notesLines.forEach((line: string) => {
+      checkPageBreak(6);
+      addText(line, 25, currentY, { fontSize: 9 });
+      currentY += 4;
+    });
     
     currentY += 6;
   }

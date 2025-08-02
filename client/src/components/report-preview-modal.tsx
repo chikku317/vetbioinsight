@@ -29,7 +29,8 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
       const labTestName = report.reportType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Laboratory Report';
       const parentName = report.parentsName || 'Unknown';
       const patientName = report.patientName || 'Unknown';
-      const currentDate = new Date().toISOString().split('T')[0];
+      const currentDateStr = new Date().toISOString();
+      const currentDate = currentDateStr.includes('T') ? currentDateStr.split('T')[0] : currentDateStr;
       const filename = `${labTestName}_${parentName}_${patientName}_${currentDate}.pdf`;
       pdf.save(filename);
     } catch (error) {
@@ -233,7 +234,7 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
                   <div><strong>Collection Date:</strong> {report.collectionDate || "Not Provided"}</div>
                 </div>
                 <div className="space-y-2">
-                  <div><strong>Species/Breed:</strong> {report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : "Not Specified"}{report.breed ? ` / ${report.breed}` : ""}</div>
+                  <div><strong>Species/Breed:</strong> {report.species && report.species.length > 0 ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : "Not Specified"}{report.breed ? ` / ${report.breed}` : ""}</div>
                   <div><strong>Medical Record:</strong> {report.medicalRecordNumber || "N/A"}</div>
                   <div><strong>Report Date:</strong> {report.reportDate || "Not Provided"}</div>
                   <div><strong>Attending Veterinarian:</strong> {report.attendingVeterinarian || "Not Provided"}</div>

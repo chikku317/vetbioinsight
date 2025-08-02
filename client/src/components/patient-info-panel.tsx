@@ -68,7 +68,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
                     <SelectContent>
                       {speciesOptions.map((species) => (
                         <SelectItem key={species} value={species}>
-                          {species.charAt(0).toUpperCase() + species.slice(1)}
+                          {species && species.length > 0 ? species.charAt(0).toUpperCase() + species.slice(1) : 'N/A'}
                         </SelectItem>
                       ))}
                     </SelectContent>

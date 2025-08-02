@@ -77,7 +77,7 @@ function TestField({ form, testKey, label, unit, species, step = "1", className 
       
       {range && (
         <div className="text-xs text-medical-gray mt-2">
-          Reference: {range.min}-{range.max} {range.unit} ({species.charAt(0).toUpperCase() + species.slice(1)})
+          Reference: {range.min}-{range.max} {range.unit} ({species && species.length > 0 ? species.charAt(0).toUpperCase() + species.slice(1) : 'N/A'})
         </div>
       )}
     </div>
@@ -152,7 +152,7 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
                 />
               </div>
               <div className="text-xs text-medical-gray mt-2">
-                Reference: {referenceRanges[species].totalBilirubin.min}-{referenceRanges[species].totalBilirubin.max} mg/dL ({species.charAt(0).toUpperCase() + species.slice(1)})
+                Reference: {referenceRanges[species].totalBilirubin.min}-{referenceRanges[species].totalBilirubin.max} mg/dL ({species && species.length > 0 ? species.charAt(0).toUpperCase() + species.slice(1) : 'N/A'})
               </div>
             </div>
           </div>
