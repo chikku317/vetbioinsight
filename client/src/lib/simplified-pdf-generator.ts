@@ -37,20 +37,20 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
     }
   };
 
-  // Header - ThePetNest professional header with A4 optimized sizing
+  // Header - ThePetNest professional header with Extended Professional specifications
   try {
-    // A4 optimized header: 794x150 pixels (5-7% of page height with proper margins)
-    const headerHeight = Math.round(pageHeight * 0.06); // 6% of page height (~40mm)
+    // Extended Professional Header: 2480x500 pixels (14% of A4 height, 210mm x 42mm)
+    const headerHeight = Math.round(pageHeight * 0.14); // 14% of page height (~42mm)
     const headerWidth = pageWidth;
-    const marginTop = Math.round(pageHeight * 0.015); // 1.5% margin (~4mm)
+    const marginTop = Math.round(pageHeight * 0.01); // 1% margin (~3mm)
     
     pdf.addImage(headerImagePath, 'PNG', 0, marginTop, headerWidth, headerHeight);
     currentY = headerHeight + marginTop + 10;
   } catch (error) {
     console.warn("Could not load header image, using fallback:", error);
-    // Fallback header with proper A4 proportions
-    const headerHeight = Math.round(pageHeight * 0.06);
-    const marginTop = Math.round(pageHeight * 0.015);
+    // Fallback header with Extended Professional proportions
+    const headerHeight = Math.round(pageHeight * 0.14);
+    const marginTop = Math.round(pageHeight * 0.01);
     
     pdf.setFillColor(52, 73, 151);
     pdf.rect(0, marginTop, pageWidth, headerHeight, "F");
@@ -207,11 +207,28 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
       currentY += 8;
       
       try {
-        // Add the first image (optimized for specimens)
+        // Add the first image with preserved original dimensions
         const imageData = report.images[0];
         if (typeof imageData === 'string' && imageData.startsWith('data:image/')) {
-          const imgWidth = Math.min(120, pageWidth - 50);
-          const imgHeight = 60; // Fixed height for consistency
+          // Create a temporary image to get original dimensions
+          const tempImage = new Image();
+          tempImage.src = imageData;
+          
+          // Calculate dimensions while preserving aspect ratio
+          const maxWidth = pageWidth - 50; // Leave margins
+          const maxHeight = 80; // Maximum height for layout
+          
+          // Get original dimensions (fallback if unable to detect)
+          const originalWidth = tempImage.naturalWidth || 800;
+          const originalHeight = tempImage.naturalHeight || 600;
+          
+          // Calculate scale to fit within bounds while preserving aspect ratio
+          const scaleWidth = maxWidth / originalWidth;
+          const scaleHeight = maxHeight / originalHeight;
+          const scale = Math.min(scaleWidth, scaleHeight);
+          
+          const imgWidth = originalWidth * scale;
+          const imgHeight = originalHeight * scale;
           
           pdf.addImage(imageData, 'JPEG', 25, currentY, imgWidth, imgHeight);
           currentY += imgHeight + 10;

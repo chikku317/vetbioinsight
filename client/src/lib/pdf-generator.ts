@@ -48,28 +48,32 @@ export function generateVetReportPDF(
     }
   };
 
-  // Header - ThePetNest professional header using provided image
+  // Header - ThePetNest professional header with Extended Professional specifications
   try {
-    // Add the header image with proper dimensions: 794 x 150 pixels (5.3:1 aspect ratio)
-    // Convert to PDF units: 794px at 96 DPI = ~210mm, 150px = ~40mm
-    const headerHeight = 40; // 40mm height as specified
-    pdf.addImage(headerImagePath, 'PNG', 0, 0, pageWidth, headerHeight);
-    currentY = headerHeight + 10; // Spacing below header
+    // Extended Professional Header: 2480x500 pixels (14% of A4 height, 210mm x 42mm)
+    const headerHeight = Math.round(pageHeight * 0.14); // 14% of page height (~42mm)
+    const marginTop = Math.round(pageHeight * 0.01); // 1% margin (~3mm)
+    
+    pdf.addImage(headerImagePath, 'PNG', 0, marginTop, pageWidth, headerHeight);
+    currentY = headerHeight + marginTop + 10;
   } catch (error) {
     console.warn("Could not load header image, using fallback:", error);
-    // Fallback header if image fails to load
+    // Fallback header with Extended Professional proportions
+    const headerHeight = Math.round(pageHeight * 0.14);
+    const marginTop = Math.round(pageHeight * 0.01);
+    
     pdf.setFillColor(52, 73, 151);
-    pdf.rect(0, 0, pageWidth, 50, "F");
+    pdf.rect(0, marginTop, pageWidth, headerHeight, "F");
     pdf.setFillColor(255, 140, 0);
-    pdf.rect(pageWidth - 40, 0, 40, 50, "F");
+    pdf.rect(pageWidth - 40, marginTop, 40, headerHeight, "F");
     pdf.setTextColor(255, 255, 255);
-    addText("ThePetNest", 20, 18, { fontSize: 24, fontStyle: "bold" });
-    addText("PET STORE | LAB | SPA | CLINIC", 20, 28, { fontSize: 11 });
-    addText("8848216190 | 8590433937", pageWidth - 50, 18, { fontSize: 12, fontStyle: "bold" });
-    addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, 38, { fontSize: 9 });
-    addText("support.trivandrum@thepetnest.com", 20, 46, { fontSize: 9 });
+    addText("ThePetNest", 20, marginTop + 25, { fontSize: 24, fontStyle: "bold" });
+    addText("PET STORE | LAB | SPA | CLINIC", 20, marginTop + 38, { fontSize: 11 });
+    addText("8848216190 | 8590433937", pageWidth - 50, marginTop + 25, { fontSize: 12, fontStyle: "bold" });
+    addText("3358/2, Thiruvonam, Chanthavila, Trivandrum, 695584", 20, marginTop + 48, { fontSize: 9 });
+    addText("support.trivandrum@thepetnest.com", 20, marginTop + 58, { fontSize: 9 });
     pdf.setTextColor(0, 0, 0);
-    currentY = 60;
+    currentY = headerHeight + marginTop + 10;
   }
   
   // Report title
