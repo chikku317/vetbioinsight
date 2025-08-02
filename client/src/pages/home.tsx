@@ -258,6 +258,7 @@ export default function Home() {
       medicalRecordNumber: formData.medicalRecordNumber || null,
       collectionDate: formData.collectionDate,
       reportDate: formData.reportDate,
+      attendingVeterinarian: formData.attendingVeterinarian || null,
       testResults: formData.testResults,
       observation: formData.observation || null,
       advice: formData.advice || null,
@@ -315,14 +316,6 @@ export default function Home() {
               <div className="text-sm text-medical-gray">
                 Progress: <span className="font-medium text-medical-blue">{progress}%</span>
               </div>
-              <Button 
-                onClick={handleGeneratePDF}
-                className="bg-medical-blue hover:bg-blue-600"
-                disabled={!patientName}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Generate Report
-              </Button>
             </div>
           </div>
         </div>
@@ -380,9 +373,17 @@ export default function Home() {
                       }
                     />
                     <Button 
+                      onClick={handleGeneratePDF}
+                      className="bg-medical-blue hover:bg-blue-600 w-full sm:w-auto"
+                      disabled={!patientName}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Generate Report
+                    </Button>
+                    <Button 
                       type="submit"
                       disabled={isLoading || !isFormValid}
-                      className="bg-medical-blue hover:bg-blue-600 w-full sm:w-auto"
+                      className="bg-success-green hover:bg-green-600 w-full sm:w-auto"
                     >
                       <FileText className="mr-2 h-4 w-4" />
                       {isLoading ? "Saving..." : "Save Report"}

@@ -40,7 +40,7 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
 
   const testResults = report.testResults as TestResults;
   const species = report.species as Species;
-  const ranges = referenceRanges[species];
+  const ranges = referenceRanges[species] || referenceRanges.dog;
 
   const testPanels = [
     {
@@ -126,14 +126,16 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="space-y-2">
-                  <div><strong>Patient Name:</strong> {report.patientName}</div>
-                  <div><strong>Age/Weight:</strong> {report.age} {report.ageUnit} / {report.weight} {report.weightUnit}</div>
-                  <div><strong>Collection Date:</strong> {report.collectionDate}</div>
+                  <div><strong>Patient Name:</strong> {report.patientName || "Not Provided"}</div>
+                  <div><strong>Parent Name:</strong> {report.parentsName || "Not Provided"}</div>
+                  <div><strong>Age/Weight:</strong> {report.age || "N/A"} {report.ageUnit || ""} / {report.weight || "N/A"} {report.weightUnit || ""}</div>
+                  <div><strong>Collection Date:</strong> {report.collectionDate || "Not Provided"}</div>
                 </div>
                 <div className="space-y-2">
-                  <div><strong>Species/Breed:</strong> {report.species.charAt(0).toUpperCase() + report.species.slice(1)}{report.breed ? ` / ${report.breed}` : ""}</div>
+                  <div><strong>Species/Breed:</strong> {report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1) : "Not Specified"}{report.breed ? ` / ${report.breed}` : ""}</div>
                   <div><strong>Medical Record:</strong> {report.medicalRecordNumber || "N/A"}</div>
-                  <div><strong>Report Date:</strong> {report.reportDate}</div>
+                  <div><strong>Report Date:</strong> {report.reportDate || "Not Provided"}</div>
+                  <div><strong>Attending Veterinarian:</strong> {report.attendingVeterinarian || "Not Provided"}</div>
                 </div>
               </div>
             </div>
@@ -154,9 +156,15 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
                 <div key={panelIndex} className="mb-4">
                   <div className="bg-blue-50 p-2 font-semibold text-sm">{panel.name}</div>
                   {panel.tests.map((test, testIndex) => {
-                    const value = testResults[test.key as keyof TestResults];
-                    const status = value !== undefined && value !== null ? getTestStatus(Number(value), test.range) : null;
-                    const statusLabel = status ? getStatusLabel(status) : "-";
+                    const value = testResults?.[test.key as keyof TestResults];
+                    // Only show tests that have values
+                    if (value === undefined || value === null || value === "" || String(value).trim() === "") {
+                      return null;
+                    }
+                    
+                    const numericValue = Number(value);
+                    const status = !isNaN(numericValue) ? getTestStatus(numericValue, test.range) : "normal";
+                    const statusLabel = getStatusLabel(status);
                     
                     return (
                       <div key={testIndex} className={`grid grid-cols-5 gap-4 p-2 text-sm border-b ${
@@ -164,19 +172,17 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
                         status === "critical" ? "bg-red-50" : ""
                       }`}>
                         <div>{test.name}</div>
-                        <div className="text-center">{value !== undefined && value !== null ? value : "Not Tested"}</div>
+                        <div className="text-center">{value}</div>
                         <div className="text-center">{test.range.unit}</div>
                         <div className="text-center">{test.range.min}-{test.range.max}</div>
                         <div className="text-center">
-                          {status && (
-                            <Badge className={
-                              status === "normal" ? "bg-success-green text-white" :
-                              status === "critical" ? "bg-error-red text-white" :
-                              "bg-warning-yellow text-white"
-                            }>
-                              {statusLabel}
-                            </Badge>
-                          )}
+                          <Badge className={
+                            status === "normal" ? "bg-success-green text-white" :
+                            status === "critical" ? "bg-error-red text-white" :
+                            "bg-warning-yellow text-white"
+                          }>
+                            {statusLabel}
+                          </Badge>
                         </div>
                       </div>
                     );
