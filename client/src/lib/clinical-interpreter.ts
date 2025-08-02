@@ -21,7 +21,7 @@ export function generateClinicalInterpretations(
   let hepaticSeverity: "normal" | "mild" | "moderate" | "severe" = "normal";
 
   if (testResults.alt !== undefined) {
-    const altStatus = getTestStatus(testResults.alt, ranges.alt);
+    const altStatus = getTestStatus("alt", testResults.alt, species);
     if (altStatus === "high" || altStatus === "critical") {
       hepaticFindings.push(`Elevated ALT (${testResults.alt} U/L) suggests hepatocellular injury`);
       if (altStatus === "critical") hepaticSeverity = "severe";
@@ -30,16 +30,16 @@ export function generateClinicalInterpretations(
   }
 
   if (testResults.alp !== undefined) {
-    const alpStatus = getTestStatus(testResults.alp, ranges.alp);
+    const alpStatus = getTestStatus("alp", testResults.alp, species);
     if (alpStatus === "high" || alpStatus === "critical") {
       hepaticFindings.push(`Elevated ALP (${testResults.alp} U/L) may indicate cholestatic pattern or bone turnover`);
-      if (altStatus === "critical") hepaticSeverity = "severe";
+      if (alpStatus === "critical") hepaticSeverity = "severe";
       else if (hepaticSeverity === "normal") hepaticSeverity = "mild";
     }
   }
 
   if (testResults.ggt !== undefined) {
-    const ggtStatus = getTestStatus(testResults.ggt, ranges.ggt);
+    const ggtStatus = getTestStatus("ggt", testResults.ggt, species);
     if (ggtStatus === "high" || ggtStatus === "critical") {
       hepaticFindings.push(`Elevated GGT (${testResults.ggt} U/L) supports cholestatic liver disease`);
       if (ggtStatus === "critical") hepaticSeverity = "moderate";
@@ -47,7 +47,7 @@ export function generateClinicalInterpretations(
   }
 
   if (testResults.totalBilirubin !== undefined) {
-    const bilirubinStatus = getTestStatus(testResults.totalBilirubin, ranges.totalBilirubin);
+    const bilirubinStatus = getTestStatus("totalBilirubin", testResults.totalBilirubin, species);
     if (bilirubinStatus === "high" || bilirubinStatus === "critical") {
       hepaticFindings.push(`Elevated total bilirubin (${testResults.totalBilirubin} mg/dL) indicates impaired bilirubin metabolism`);
       if (bilirubinStatus === "critical") hepaticSeverity = "severe";
@@ -57,8 +57,8 @@ export function generateClinicalInterpretations(
 
   // Check for cholestatic pattern
   if (testResults.alp !== undefined && testResults.ggt !== undefined) {
-    const alpStatus = getTestStatus(testResults.alp, ranges.alp);
-    const ggtStatus = getTestStatus(testResults.ggt, ranges.ggt);
+    const alpStatus = getTestStatus("alp", testResults.alp, species);
+    const ggtStatus = getTestStatus("ggt", testResults.ggt, species);
     if ((alpStatus === "high" || alpStatus === "critical") && 
         (ggtStatus === "high" || ggtStatus === "critical")) {
       hepaticFindings.push("Cholestatic pattern (elevated ALP + GGT) suggests bile duct involvement");
@@ -84,8 +84,8 @@ export function generateClinicalInterpretations(
   let renalSeverity: "normal" | "mild" | "moderate" | "severe" = "normal";
 
   if (testResults.bun !== undefined && testResults.creatinine !== undefined) {
-    const bunStatus = getTestStatus(testResults.bun, ranges.bun);
-    const creatinineStatus = getTestStatus(testResults.creatinine, ranges.creatinine);
+    const bunStatus = getTestStatus("bun", testResults.bun, species);
+    const creatinineStatus = getTestStatus("creatinine", testResults.creatinine, species);
     
     if ((bunStatus === "high" || bunStatus === "critical") && 
         (creatinineStatus === "high" || creatinineStatus === "critical")) {
@@ -129,14 +129,14 @@ export function generateClinicalInterpretations(
   let electrolyteSeverity: "normal" | "mild" | "moderate" | "severe" = "normal";
 
   if (testResults.potassium !== undefined) {
-    const potassiumStatus = getTestStatus(testResults.potassium, ranges.potassium);
+    const potassiumStatus = getTestStatus("potassium", testResults.potassium, species);
     if (potassiumStatus === "low" || potassiumStatus === "critical") {
       electrolyteFindings.push(`Hypokalemia (${testResults.potassium} mEq/L) detected`);
       electrolyteRecommendations.push("Consider potassium supplementation");
       electrolyteRecommendations.push("Monitor for cardiac arrhythmias");
       if (potassiumStatus === "critical") electrolyteSeverity = "severe";
       else electrolyteSeverity = "moderate";
-    } else if (potassiumStatus === "high") {
+    } else if (potassiumStatus === "high" || potassiumStatus === "critical") {
       electrolyteFindings.push(`Hyperkalemia (${testResults.potassium} mEq/L) detected`);
       electrolyteRecommendations.push("Evaluate for hemolysis or tissue breakdown");
       if (potassiumStatus === "critical") electrolyteSeverity = "severe";
@@ -145,7 +145,7 @@ export function generateClinicalInterpretations(
   }
 
   if (testResults.sodium !== undefined) {
-    const sodiumStatus = getTestStatus(testResults.sodium, ranges.sodium);
+    const sodiumStatus = getTestStatus("sodium", testResults.sodium, species);
     if (sodiumStatus === "low") {
       electrolyteFindings.push(`Hyponatremia (${testResults.sodium} mEq/L) present`);
       electrolyteRecommendations.push("Evaluate hydration status and fluid balance");
