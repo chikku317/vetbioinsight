@@ -40,6 +40,7 @@ export const vetReports = pgTable("vet_reports", {
   observation: text("observation"),
   advice: text("advice"),
   notes: text("notes"),
+  dogNotes: text("dog_notes"), // Additional notes field for dog details
   
   // Image attachments
   images: jsonb("images").default([]),
@@ -180,6 +181,7 @@ export const insertVetReportSchema = createInsertSchema(vetReports).omit({
   observation: z.string().optional().nullable(),
   advice: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
+  dogNotes: z.string().optional().nullable(),
   images: z.array(z.string()).default([]),
   clinicalNotes: z.string().optional().nullable(),
   clinicalNotesEnabled: z.boolean().default(false),

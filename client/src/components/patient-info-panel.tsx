@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UseFormReturn } from "react-hook-form";
@@ -234,6 +235,25 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
                 <FormLabel>Attending Veterinarian</FormLabel>
                 <FormControl>
                   <Input placeholder="Dr. Sarah Johnson" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="dogNotes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Enter additional notes about the patient" 
+                    {...field} 
+                    value={field.value || ""} 
+                    rows={3}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

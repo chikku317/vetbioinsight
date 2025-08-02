@@ -38,55 +38,156 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
     }
   };
 
-  const testResults = report.testResults as TestResults;
-  const species = report.species as Species;
-  const ranges = referenceRanges[species] || referenceRanges.dog;
+  // Render different preview content based on report type
+  const renderPreviewContent = () => {
+    if (report.reportType === 'biochemistry') {
+      const testResults = report.testResults as TestResults;
+      const species = report.species as Species;
+      const ranges = referenceRanges[species] || referenceRanges.dog;
 
-  const testPanels = [
-    {
-      name: "LIVER FUNCTION TESTS",
-      tests: [
-        { key: "alt", name: "Alanine Aminotransferase (ALT)", range: ranges.alt },
-        { key: "alp", name: "Alkaline Phosphatase (ALP)", range: ranges.alp },
-        { key: "ggt", name: "Gamma Glutamyl Transferase (GGT)", range: ranges.ggt },
-        { key: "totalBilirubin", name: "Total Bilirubin", range: ranges.totalBilirubin }
-      ]
-    },
-    {
-      name: "KIDNEY FUNCTION TESTS",
-      tests: [
-        { key: "bun", name: "Blood Urea Nitrogen (BUN)", range: ranges.bun },
-        { key: "creatinine", name: "Creatinine", range: ranges.creatinine },
-        { key: "phosphorus", name: "Phosphorus", range: ranges.phosphorus }
-      ]
-    },
-    {
-      name: "ELECTROLYTES & MINERALS",
-      tests: [
-        { key: "sodium", name: "Sodium (Na+)", range: ranges.sodium },
-        { key: "potassium", name: "Potassium (K+)", range: ranges.potassium },
-        { key: "chloride", name: "Chloride (Cl-)", range: ranges.chloride },
-        { key: "calcium", name: "Calcium (Total)", range: ranges.calcium }
-      ]
-    },
-    {
-      name: "PROTEIN STUDIES",
-      tests: [
-        { key: "totalProtein", name: "Total Protein", range: ranges.totalProtein },
-        { key: "albumin", name: "Albumin", range: ranges.albumin },
-        { key: "globulin", name: "Globulin", range: ranges.globulin }
-      ]
-    },
-    {
-      name: "METABOLISM & ENZYMES",
-      tests: [
-        { key: "glucose", name: "Glucose", range: ranges.glucose },
-        { key: "cholesterol", name: "Cholesterol", range: ranges.cholesterol },
-        { key: "amylase", name: "Amylase", range: ranges.amylase },
-        { key: "lipase", name: "Lipase", range: ranges.lipase }
-      ]
+      const testPanels = [
+        {
+          name: "LIVER FUNCTION TESTS",
+          tests: [
+            { key: "alt", name: "Alanine Aminotransferase (ALT)", range: ranges.alt },
+            { key: "alp", name: "Alkaline Phosphatase (ALP)", range: ranges.alp },
+            { key: "ggt", name: "Gamma Glutamyl Transferase (GGT)", range: ranges.ggt },
+            { key: "totalBilirubin", name: "Total Bilirubin", range: ranges.totalBilirubin }
+          ]
+        },
+        {
+          name: "KIDNEY FUNCTION TESTS",
+          tests: [
+            { key: "bun", name: "Blood Urea Nitrogen (BUN)", range: ranges.bun },
+            { key: "creatinine", name: "Creatinine", range: ranges.creatinine },
+            { key: "phosphorus", name: "Phosphorus", range: ranges.phosphorus }
+          ]
+        },
+        {
+          name: "ELECTROLYTES & MINERALS",
+          tests: [
+            { key: "sodium", name: "Sodium (Na+)", range: ranges.sodium },
+            { key: "potassium", name: "Potassium (K+)", range: ranges.potassium },
+            { key: "chloride", name: "Chloride (Cl-)", range: ranges.chloride },
+            { key: "calcium", name: "Calcium (Total)", range: ranges.calcium }
+          ]
+        },
+        {
+          name: "PROTEIN STUDIES",
+          tests: [
+            { key: "totalProtein", name: "Total Protein", range: ranges.totalProtein },
+            { key: "albumin", name: "Albumin", range: ranges.albumin },
+            { key: "globulin", name: "Globulin", range: ranges.globulin }
+          ]
+        },
+        {
+          name: "METABOLISM & ENZYMES",
+          tests: [
+            { key: "glucose", name: "Glucose", range: ranges.glucose },
+            { key: "cholesterol", name: "Cholesterol", range: ranges.cholesterol },
+            { key: "amylase", name: "Amylase", range: ranges.amylase },
+            { key: "lipase", name: "Lipase", range: ranges.lipase }
+          ]
+        }
+      ];
+
+      return (
+        <div className="mb-6">
+          <div className="bg-medical-blue text-white p-2 mb-2">
+            <div className="grid grid-cols-5 gap-4 text-sm font-bold">
+              <div>Test Parameter</div>
+              <div className="text-center">Result</div>
+              <div className="text-center">Units</div>
+              <div className="text-center">Reference Range</div>
+              <div className="text-center">Status</div>
+            </div>
+          </div>
+
+          {testPanels.map((panel, panelIndex) => (
+            <div key={panelIndex} className="mb-4">
+              <div className="bg-blue-50 p-2 font-semibold text-sm">{panel.name}</div>
+              {panel.tests.map((test, testIndex) => {
+                const value = testResults?.[test.key as keyof TestResults];
+                // Only show tests that have values
+                if (value === undefined || value === null || value === "" || String(value).trim() === "") {
+                  return null;
+                }
+                
+                const numericValue = Number(value);
+                const status = !isNaN(numericValue) ? getTestStatus(numericValue, test.range) : "normal";
+                const statusLabel = getStatusLabel(status);
+                
+                return (
+                  <div key={testIndex} className={`grid grid-cols-5 gap-4 p-2 text-sm border-b ${
+                    status === "high" || status === "low" ? "bg-yellow-50" : 
+                    status === "critical" ? "bg-red-50" : ""
+                  }`}>
+                    <div>{test.name}</div>
+                    <div className="text-center">{value}</div>
+                    <div className="text-center">{test.range.unit}</div>
+                    <div className="text-center">{test.range.min}-{test.range.max}</div>
+                    <div className="text-center">
+                      <Badge className={
+                        status === "normal" ? "bg-success-green text-white" :
+                        status === "critical" ? "bg-error-red text-white" :
+                        "bg-warning-yellow text-white"
+                      }>
+                        {statusLabel}
+                      </Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      );
+    } else {
+      // For non-biochemistry reports, show test-specific content
+      return (
+        <div className="mb-6">
+          <div className="bg-gray-50 p-4 rounded-md">
+            <h3 className="font-semibold text-gray-800 mb-3">TEST RESULTS</h3>
+            {report.reportType === 'skin_scraping' && (
+              <div className="space-y-2 text-sm">
+                <div><strong>Scraping Site:</strong> {(report.testResults as any)?.scrapingSite || "Not specified"}</div>
+                <div><strong>Scraping Depth:</strong> {(report.testResults as any)?.scrapingDepth || "Not specified"}</div>
+                <div><strong>Mites Detected:</strong> {(report.testResults as any)?.mitesDetected || "None"}</div>
+                <div><strong>Fungal Elements:</strong> {(report.testResults as any)?.fungalElements || "None"}</div>
+                <div><strong>Secondary Infections:</strong> {(report.testResults as any)?.secondaryInfections?.join(", ") || "None"}</div>
+              </div>
+            )}
+            {report.reportType === 'blood_smear' && (
+              <div className="space-y-2 text-sm">
+                <div><strong>RBC Morphology:</strong> {(report.testResults as any)?.rbcMorphology || "Not specified"}</div>
+                <div><strong>WBC Count:</strong> {(report.testResults as any)?.wbcCount || "Not specified"}</div>
+                <div><strong>Platelet Count:</strong> {(report.testResults as any)?.plateletCount || "Not specified"}</div>
+                <div><strong>Parasites:</strong> {(report.testResults as any)?.parasites || "None detected"}</div>
+                <div><strong>Cell Distribution:</strong> {(report.testResults as any)?.cellDistribution || "Not specified"}</div>
+              </div>
+            )}
+            {report.reportType === 'progesterone' && (
+              <div className="space-y-2 text-sm">
+                <div><strong>Progesterone Level:</strong> {(report.testResults as any)?.progesteroneLevel || "Not tested"} ng/mL</div>
+                {report.advice && <div><strong>Recommendation:</strong> {report.advice}</div>}
+              </div>
+            )}
+            {/* Add other test types as needed */}
+            {report.observation && (
+              <div className="mt-3">
+                <strong>Observation:</strong> {report.observation}
+              </div>
+            )}
+            {report.notes && (
+              <div className="mt-3">
+                <strong>Notes:</strong> {report.notes}
+              </div>
+            )}
+          </div>
+        </div>
+      );
     }
-  ];
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -110,8 +211,8 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
           <div className="bg-white p-8 shadow-sm mb-4">
             <div className="flex items-center justify-between border-b-2 border-medical-blue pb-4 mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-medical-blue">VetLab Diagnostics</h1>
-                <p className="text-sm text-gray-600">Veterinary Biochemistry Analysis Report</p>
+                <h1 className="text-2xl font-bold text-medical-blue">ThePetNest Laboratory</h1>
+                <p className="text-sm text-gray-600">{report.reportType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Report</p>
               </div>
               <div className="text-right text-sm text-gray-600">
                 <p>Report ID: VLB-{new Date().getFullYear()}-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</p>
@@ -132,64 +233,17 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
                   <div><strong>Collection Date:</strong> {report.collectionDate || "Not Provided"}</div>
                 </div>
                 <div className="space-y-2">
-                  <div><strong>Species/Breed:</strong> {report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1) : "Not Specified"}{report.breed ? ` / ${report.breed}` : ""}</div>
+                  <div><strong>Species/Breed:</strong> {report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : "Not Specified"}{report.breed ? ` / ${report.breed}` : ""}</div>
                   <div><strong>Medical Record:</strong> {report.medicalRecordNumber || "N/A"}</div>
                   <div><strong>Report Date:</strong> {report.reportDate || "Not Provided"}</div>
                   <div><strong>Attending Veterinarian:</strong> {report.attendingVeterinarian || "Not Provided"}</div>
+                  <div><strong>Notes:</strong> {(report as any).dogNotes || "Not Provided"}</div>
                 </div>
               </div>
             </div>
 
-            {/* Test Results Table */}
-            <div className="mb-6">
-              <div className="bg-medical-blue text-white p-2 mb-2">
-                <div className="grid grid-cols-5 gap-4 text-sm font-bold">
-                  <div>Test Parameter</div>
-                  <div className="text-center">Result</div>
-                  <div className="text-center">Units</div>
-                  <div className="text-center">Reference Range</div>
-                  <div className="text-center">Status</div>
-                </div>
-              </div>
-
-              {testPanels.map((panel, panelIndex) => (
-                <div key={panelIndex} className="mb-4">
-                  <div className="bg-blue-50 p-2 font-semibold text-sm">{panel.name}</div>
-                  {panel.tests.map((test, testIndex) => {
-                    const value = testResults?.[test.key as keyof TestResults];
-                    // Only show tests that have values
-                    if (value === undefined || value === null || value === "" || String(value).trim() === "") {
-                      return null;
-                    }
-                    
-                    const numericValue = Number(value);
-                    const status = !isNaN(numericValue) ? getTestStatus(numericValue, test.range) : "normal";
-                    const statusLabel = getStatusLabel(status);
-                    
-                    return (
-                      <div key={testIndex} className={`grid grid-cols-5 gap-4 p-2 text-sm border-b ${
-                        status === "high" || status === "low" ? "bg-yellow-50" : 
-                        status === "critical" ? "bg-red-50" : ""
-                      }`}>
-                        <div>{test.name}</div>
-                        <div className="text-center">{value}</div>
-                        <div className="text-center">{test.range.unit}</div>
-                        <div className="text-center">{test.range.min}-{test.range.max}</div>
-                        <div className="text-center">
-                          <Badge className={
-                            status === "normal" ? "bg-success-green text-white" :
-                            status === "critical" ? "bg-error-red text-white" :
-                            "bg-warning-yellow text-white"
-                          }>
-                            {statusLabel}
-                          </Badge>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
+            {/* Test Results */}
+            {renderPreviewContent()}
 
             {/* Clinical Notes */}
             {report.clinicalNotes && (

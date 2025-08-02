@@ -90,10 +90,11 @@ export function generateVetReportPDF(
 
   // Patient Information Table with better alignment
   const tableData = [
-    ["Patient Name:", report.patientName, "Species/Breed:", `${report.species.charAt(0).toUpperCase() + report.species.slice(1)}${report.breed ? ` / ${report.breed}` : ""}`],
+    ["Patient Name:", report.patientName, "Species/Breed:", `${report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : 'N/A'}${report.breed ? ` / ${report.breed}` : ""}`],
     ["Parents Name:", report.parentsName || "N/A", "Medical Record:", report.medicalRecordNumber || "N/A"],
     ["Age/Weight:", `${report.age} ${report.ageUnit} / ${report.weight} ${report.weightUnit}`, "Collection Date:", report.collectionDate],
-    ["Attending Veterinarian:", report.attendingVeterinarian || 'N/A', "Report Date:", report.reportDate]
+    ["Attending Veterinarian:", report.attendingVeterinarian || 'N/A', "Report Date:", report.reportDate],
+    ["Notes:", (report as any).dogNotes || 'N/A', "", ""]
   ];
 
   // Draw table with better alignment (simple clean table)

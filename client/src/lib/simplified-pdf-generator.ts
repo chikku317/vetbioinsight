@@ -82,13 +82,14 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
   const patientInfo = [
     [`Patient Name:`, report.patientName || 'N/A'],
     [`Parent Name:`, report.parentsName || 'N/A'],
-    [`Species:`, report.species || 'N/A'],
+    [`Species:`, report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : 'N/A'],
     [`Breed:`, report.breed || 'N/A'],
     [`Age:`, `${report.age || 'N/A'} ${report.ageUnit || ''}`],
     [`Weight:`, `${report.weight || 'N/A'} ${report.weightUnit || ''}`],
     [`Collection Date:`, report.collectionDate || 'N/A'],
     [`Report Date:`, report.reportDate || 'N/A'],
     [`Attending Veterinarian:`, report.attendingVeterinarian || 'N/A'],
+    [`Notes:`, (report as any).dogNotes || 'N/A'],
   ];
 
   patientInfo.forEach(([label, value]) => {
