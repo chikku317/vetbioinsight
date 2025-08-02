@@ -94,6 +94,7 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
     [`Report Date:`, safeReport.reportDate],
     [`Attending Veterinarian:`, safeReport.attendingVeterinarian],
     [`Notes:`, (safeReport as any).dogNotes || 'N/A'],
+    [`Follow-up Date:`, safeReport.followUpDate || 'N/A'],
   ];
 
   patientInfo.forEach(([label, value]) => {

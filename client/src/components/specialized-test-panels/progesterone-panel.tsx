@@ -43,6 +43,7 @@ export function ProgesteronePanel({ form }: ProgesteronePanelProps) {
                     step="0.1"
                     placeholder="e.g., 2.5"
                     {...field}
+                    value={field.value || ""}
                     onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                   />
                 </FormControl>
@@ -58,7 +59,7 @@ export function ProgesteronePanel({ form }: ProgesteronePanelProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Advice</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value || ""}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select recommendation" />

@@ -310,10 +310,20 @@ export function getStatusLabel(status: 'normal' | 'low' | 'high' | 'critical'): 
 
 export function getStatusColor(status: 'normal' | 'low' | 'high' | 'critical'): string {
   switch (status) {
-    case 'normal': return 'text-green-600 bg-green-50';
-    case 'low': return 'text-yellow-600 bg-yellow-50';
-    case 'high': return 'text-yellow-600 bg-yellow-50';
-    case 'critical': return 'text-red-600 bg-red-50';
-    default: return 'text-gray-600 bg-gray-50';
+    case 'normal': return 'text-green-700 bg-green-100 border-green-300';
+    case 'low': return 'text-yellow-700 bg-yellow-100 border-yellow-300';
+    case 'high': return 'text-orange-700 bg-orange-100 border-orange-300';
+    case 'critical': return 'text-red-700 bg-red-100 border-red-300';
+    default: return 'text-gray-600 bg-gray-50 border-gray-200';
+  }
+}
+
+export function getStatusTextColor(status: 'normal' | 'low' | 'high' | 'critical'): string {
+  switch (status) {
+    case 'normal': return 'text-green-700';
+    case 'low': return 'text-yellow-700';
+    case 'high': return 'text-orange-700';
+    case 'critical': return 'text-red-700';
+    default: return 'text-gray-600';
   }
 }

@@ -51,6 +51,24 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="followUpDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Follow-up Date</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="date" 
+                    {...field} 
+                    value={field.value || ""} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           
           <div className="grid grid-cols-2 gap-4">
             <FormField
@@ -59,7 +77,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Species</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select species" />
@@ -119,7 +137,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
                   name="ageUnit"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger className="rounded-l-none border-l-0 w-24">
                             <SelectValue />
@@ -164,7 +182,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
                   name="weightUnit"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger className="rounded-l-none border-l-0 w-20">
                             <SelectValue />
