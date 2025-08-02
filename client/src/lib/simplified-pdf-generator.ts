@@ -82,7 +82,7 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
   const patientInfo = [
     [`Patient Name:`, report.patientName || 'N/A'],
     [`Parent Name:`, report.parentsName || 'N/A'],
-    [`Species:`, report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : 'N/A'],
+    [`Species:`, report.species && report.species.length > 0 ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : 'N/A'],
     [`Breed:`, report.breed || 'N/A'],
     [`Age:`, `${report.age || 'N/A'} ${report.ageUnit || ''}`],
     [`Weight:`, `${report.weight || 'N/A'} ${report.weightUnit || ''}`],
@@ -122,17 +122,21 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
     }
 
     // Doctor notes
-    if (report.notes) {
+    if (report.notes && typeof report.notes === 'string' && report.notes.trim()) {
       checkPageBreak(20);
       addText("DOCTOR NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
       currentY += 8;
       
-      const notesLines = pdf.splitTextToSize(report.notes, pageWidth - 50);
-      notesLines.forEach((line: string) => {
-        checkPageBreak(6);
-        addText(line, 25, currentY, { fontSize: 10 });
-        currentY += 5;
-      });
+      const notesLines = pdf.splitTextToSize(report.notes.trim(), pageWidth - 50);
+      if (Array.isArray(notesLines)) {
+        notesLines.forEach((line: string) => {
+          if (line && typeof line === 'string') {
+            checkPageBreak(6);
+            addText(line, 25, currentY, { fontSize: 10 });
+            currentY += 5;
+          }
+        });
+      }
       currentY += 5;
     }
 
@@ -172,32 +176,40 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
     // Simplified format for other tests (Observation, Advice, Image)
     
     // Observation
-    if (report.observation) {
+    if (report.observation && typeof report.observation === 'string' && report.observation.trim()) {
       checkPageBreak(30);
       addText("OBSERVATION", 20, currentY, { fontSize: 11, fontStyle: "bold" });
       currentY += 8;
       
-      const observationLines = pdf.splitTextToSize(report.observation, pageWidth - 50);
-      observationLines.forEach((line: string) => {
-        checkPageBreak(6);
-        addText(line, 25, currentY, { fontSize: 10 });
-        currentY += 5;
-      });
+      const observationLines = pdf.splitTextToSize(report.observation.trim(), pageWidth - 50);
+      if (Array.isArray(observationLines)) {
+        observationLines.forEach((line: string) => {
+          if (line && typeof line === 'string') {
+            checkPageBreak(6);
+            addText(line, 25, currentY, { fontSize: 10 });
+            currentY += 5;
+          }
+        });
+      }
       currentY += 8;
     }
 
     // Advice
-    if (report.advice) {
+    if (report.advice && typeof report.advice === 'string' && report.advice.trim()) {
       checkPageBreak(30);
       addText("ADVICE", 20, currentY, { fontSize: 11, fontStyle: "bold" });
       currentY += 8;
       
-      const adviceLines = pdf.splitTextToSize(report.advice, pageWidth - 50);
-      adviceLines.forEach((line: string) => {
-        checkPageBreak(6);
-        addText(line, 25, currentY, { fontSize: 10 });
-        currentY += 5;
-      });
+      const adviceLines = pdf.splitTextToSize(report.advice.trim(), pageWidth - 50);
+      if (Array.isArray(adviceLines)) {
+        adviceLines.forEach((line: string) => {
+          if (line && typeof line === 'string') {
+            checkPageBreak(6);
+            addText(line, 25, currentY, { fontSize: 10 });
+            currentY += 5;
+          }
+        });
+      }
       currentY += 8;
     }
 

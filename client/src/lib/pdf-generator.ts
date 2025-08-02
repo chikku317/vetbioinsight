@@ -90,7 +90,7 @@ export function generateVetReportPDF(
 
   // Patient Information Table with better alignment
   const tableData = [
-    ["Patient Name:", report.patientName, "Species/Breed:", `${report.species ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : 'N/A'}${report.breed ? ` / ${report.breed}` : ""}`],
+    ["Patient Name:", report.patientName, "Species/Breed:", `${report.species && report.species.length > 0 ? report.species.charAt(0).toUpperCase() + report.species.slice(1).toLowerCase() : 'N/A'}${report.breed ? ` / ${report.breed}` : ""}`],
     ["Parents Name:", report.parentsName || "N/A", "Medical Record:", report.medicalRecordNumber || "N/A"],
     ["Age/Weight:", `${report.age} ${report.ageUnit} / ${report.weight} ${report.weightUnit}`, "Collection Date:", report.collectionDate],
     ["Attending Veterinarian:", report.attendingVeterinarian || 'N/A', "Report Date:", report.reportDate],
@@ -248,17 +248,19 @@ export function generateVetReportPDF(
   // Skip clinical interpretations to keep report concise
 
   // Clinical Notes - only include if enabled and has meaningful content
-  if (report.clinicalNotesEnabled && report.clinicalNotes && report.clinicalNotes.trim() !== "") {
+  if (report.clinicalNotesEnabled && report.clinicalNotes && typeof report.clinicalNotes === 'string' && report.clinicalNotes.trim() !== "") {
     checkPageBreak(30);
     addText("CLINICAL NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
     currentY += 8;
     
     const notesLines = pdf.splitTextToSize(report.clinicalNotes.trim(), pageWidth - 50);
-    if (notesLines && notesLines.length > 0) {
+    if (Array.isArray(notesLines) && notesLines.length > 0) {
       notesLines.forEach((line: string) => {
-        checkPageBreak(6);
-        addText(line, 25, currentY, { fontSize: 9 });
-        currentY += 4;
+        if (line && typeof line === 'string') {
+          checkPageBreak(6);
+          addText(line, 25, currentY, { fontSize: 9 });
+          currentY += 4;
+        }
       });
     }
     
