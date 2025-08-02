@@ -103,6 +103,8 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
             <TestField form={form} testKey="alt" label="Alanine Aminotransferase (ALT)" unit="U/L" species={species} />
             <TestField form={form} testKey="alp" label="Alkaline Phosphatase (ALP)" unit="U/L" species={species} />
             <TestField form={form} testKey="ggt" label="Gamma Glutamyl Transferase (GGT)" unit="U/L" species={species} />
+            <TestField form={form} testKey="sgot" label="Serum Glutamic Oxaloacetic Transaminase (SGOT)" unit="U/L" species={species} />
+            <TestField form={form} testKey="sgpt" label="Serum Glutamic Pyruvic Transaminase (SGPT)" unit="U/L" species={species} />
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <FormLabel className="text-sm font-medium text-gray-700">Total Bilirubin</FormLabel>

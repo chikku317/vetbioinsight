@@ -45,8 +45,8 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
     ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 8, max: 40, unit: "U/L", criticalHigh: 80 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
+    sgot: { min: 8, max: 40, unit: "U/L", criticalHigh: 80 }, // SGOT reference range
+    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 }, // SGPT reference range
     totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
     bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
     creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
@@ -67,8 +67,8 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     alt: { min: 10, max: 80, unit: "U/L", criticalHigh: 150 },
     alp: { min: 14, max: 111, unit: "U/L", criticalHigh: 200 },
     ggt: { min: 0, max: 7, unit: "U/L", criticalHigh: 15 },
-    sgot: { min: 5, max: 55, unit: "U/L", criticalHigh: 110 },
-    sgpt: { min: 6, max: 83, unit: "U/L", criticalHigh: 166 },
+    sgot: { min: 5, max: 55, unit: "U/L", criticalHigh: 110 }, // SGOT reference range for cats
+    sgpt: { min: 6, max: 83, unit: "U/L", criticalHigh: 166 }, // SGPT reference range for cats
     totalBilirubin: { min: 0.0, max: 0.4, unit: "mg/dL", criticalHigh: 1.5 },
     bun: { min: 16, max: 36, unit: "mg/dL", criticalHigh: 80 },
     creatinine: { min: 0.8, max: 2.4, unit: "mg/dL", criticalHigh: 5.0 },
@@ -85,12 +85,11 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     phosphorus: { min: 3.1, max: 7.0, unit: "mg/dL", criticalHigh: 12.0 },
     calcium: { min: 8.2, max: 10.8, unit: "mg/dL", criticalLow: 6.5, criticalHigh: 13.0 },
   },
+  // Adding basic ranges for other species - in production these would be comprehensive
   horse: {
     alt: { min: 3, max: 23, unit: "U/L", criticalHigh: 50 },
     alp: { min: 143, max: 395, unit: "U/L", criticalHigh: 600 },
     ggt: { min: 4, max: 13, unit: "U/L", criticalHigh: 25 },
-    sgot: { min: 226, max: 366, unit: "U/L", criticalHigh: 500 },
-    sgpt: { min: 3, max: 23, unit: "U/L", criticalHigh: 50 },
     totalBilirubin: { min: 1.0, max: 2.0, unit: "mg/dL", criticalHigh: 4.0 },
     bun: { min: 10, max: 24, unit: "mg/dL", criticalHigh: 50 },
     creatinine: { min: 1.2, max: 1.9, unit: "mg/dL", criticalHigh: 4.0 },
@@ -107,12 +106,11 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     phosphorus: { min: 1.0, max: 4.0, unit: "mg/dL", criticalHigh: 7.0 },
     calcium: { min: 11.2, max: 13.6, unit: "mg/dL", criticalLow: 9.0, criticalHigh: 16.0 },
   },
+  // Using dog ranges as baseline for other species
   cattle: {
     alt: { min: 11, max: 40, unit: "U/L", criticalHigh: 80 },
     alp: { min: 0, max: 488, unit: "U/L", criticalHigh: 700 },
     ggt: { min: 6.1, max: 17.4, unit: "U/L", criticalHigh: 30 },
-    sgot: { min: 78, max: 132, unit: "U/L", criticalHigh: 200 },
-    sgpt: { min: 11, max: 40, unit: "U/L", criticalHigh: 80 },
     totalBilirubin: { min: 0.04, max: 0.44, unit: "mg/dL", criticalHigh: 1.0 },
     bun: { min: 6, max: 27, unit: "mg/dL", criticalHigh: 50 },
     creatinine: { min: 1.0, max: 2.0, unit: "mg/dL", criticalHigh: 4.0 },
@@ -129,13 +127,10 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     phosphorus: { min: 5.6, max: 6.5, unit: "mg/dL", criticalHigh: 10.0 },
     calcium: { min: 9.7, max: 10.4, unit: "mg/dL", criticalLow: 8.0, criticalHigh: 12.0 },
   },
-  // Using baseline values for remaining species with SGOT/SGPT added
   sheep: {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
     ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 60, max: 280, unit: "U/L", criticalHigh: 400 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
     bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
     creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
@@ -156,8 +151,6 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
     ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 60, max: 280, unit: "U/L", criticalHigh: 400 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
     bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
     creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
@@ -178,8 +171,6 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
     ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 8, max: 40, unit: "U/L", criticalHigh: 80 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
     bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
     creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
@@ -200,20 +191,18 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
     ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 8, max: 40, unit: "U/L", criticalHigh: 80 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
     bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
     creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
     amylase: { min: 200, max: 800, unit: "U/L", criticalHigh: 1500 },
     lipase: { min: 20, max: 200, unit: "U/L", criticalHigh: 400 },
-    glucose: { min: 70, max: 143, unit: "mg/dL", criticalLow: 40, criticalHigh: 250 },
+    glucose: { min: 200, max: 400, unit: "mg/dL", criticalLow: 150, criticalHigh: 600 },
     sodium: { min: 144, max: 160, unit: "mEq/L", criticalLow: 130, criticalHigh: 170 },
     potassium: { min: 3.5, max: 5.8, unit: "mEq/L", criticalLow: 2.5, criticalHigh: 7.0 },
     chloride: { min: 109, max: 122, unit: "mEq/L", criticalLow: 95, criticalHigh: 135 },
-    totalProtein: { min: 5.4, max: 7.1, unit: "g/dL", criticalLow: 4.0, criticalHigh: 9.0 },
-    albumin: { min: 2.3, max: 4.0, unit: "g/dL", criticalLow: 1.5, criticalHigh: 5.0 },
-    globulin: { min: 2.5, max: 4.5, unit: "g/dL", criticalHigh: 6.0 },
+    totalProtein: { min: 3.0, max: 5.0, unit: "g/dL", criticalLow: 2.0, criticalHigh: 7.0 },
+    albumin: { min: 1.5, max: 2.5, unit: "g/dL", criticalLow: 1.0, criticalHigh: 3.5 },
+    globulin: { min: 1.5, max: 3.0, unit: "g/dL", criticalHigh: 4.5 },
     cholesterol: { min: 112, max: 320, unit: "mg/dL", criticalHigh: 500 },
     phosphorus: { min: 2.6, max: 6.2, unit: "mg/dL", criticalHigh: 10.0 },
     calcium: { min: 9.1, max: 11.7, unit: "mg/dL", criticalLow: 7.0, criticalHigh: 14.0 },
@@ -222,30 +211,6 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
     ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 8, max: 40, unit: "U/L", criticalHigh: 80 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
-    totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
-    bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
-    creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
-    amylase: { min: 200, max: 800, unit: "U/L", criticalHigh: 1500 },
-    lipase: { min: 20, max: 200, unit: "U/L", criticalHigh: 400 },
-    glucose: { min: 70, max: 143, unit: "mg/dL", criticalLow: 40, criticalHigh: 250 },
-    sodium: { min: 144, max: 160, unit: "mEq/L", criticalLow: 130, criticalHigh: 170 },
-    potassium: { min: 3.5, max: 5.8, unit: "mEq/L", criticalLow: 2.5, criticalHigh: 7.0 },
-    chloride: { min: 109, max: 122, unit: "mEq/L", criticalLow: 95, criticalHigh: 135 },
-    totalProtein: { min: 5.4, max: 7.1, unit: "g/dL", criticalLow: 4.0, criticalHigh: 9.0 },
-    albumin: { min: 2.3, max: 4.0, unit: "g/dL", criticalLow: 1.5, criticalHigh: 5.0 },
-    globulin: { min: 2.5, max: 4.5, unit: "g/dL", criticalHigh: 6.0 },
-    cholesterol: { min: 112, max: 320, unit: "mg/dL", criticalHigh: 500 },
-    phosphorus: { min: 2.6, max: 6.2, unit: "mg/dL", criticalHigh: 10.0 },
-    calcium: { min: 9.1, max: 11.7, unit: "mg/dL", criticalLow: 7.0, criticalHigh: 14.0 },
-  },
-  exotic: {
-    alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
-    alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
-    ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 8, max: 40, unit: "U/L", criticalHigh: 80 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
     bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
     creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
@@ -266,8 +231,6 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     alp: { min: 20, max: 150, unit: "U/L", criticalHigh: 300 },
     ggt: { min: 0, max: 10, unit: "U/L", criticalHigh: 20 },
-    sgot: { min: 8, max: 40, unit: "U/L", criticalHigh: 80 },
-    sgpt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },
     totalBilirubin: { min: 0.0, max: 0.9, unit: "mg/dL", criticalHigh: 2.0 },
     bun: { min: 7, max: 27, unit: "mg/dL", criticalHigh: 60 },
     creatinine: { min: 0.5, max: 1.6, unit: "mg/dL", criticalHigh: 4.0 },
@@ -286,34 +249,32 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
   },
 };
 
-// Status checking functions
-export function getTestStatus(testKey: keyof SpeciesReferenceRanges, value: number, species: Species): 'normal' | 'low' | 'high' | 'critical' {
-  const range = referenceRanges[species][testKey];
-  if (!range) return 'normal';
-  
-  if (range.criticalLow && value < range.criticalLow) return 'critical';
-  if (range.criticalHigh && value > range.criticalHigh) return 'critical';
-  if (value < range.min) return 'low';
-  if (value > range.max) return 'high';
-  return 'normal';
+export type TestStatus = "normal" | "high" | "low" | "critical";
+
+export function getTestStatus(value: number, range: ReferenceRange): TestStatus {
+  if (range.criticalLow && value < range.criticalLow) return "critical";
+  if (range.criticalHigh && value > range.criticalHigh) return "critical";
+  if (value < range.min) return "low";
+  if (value > range.max) return "high";
+  return "normal";
 }
 
-export function getStatusLabel(status: 'normal' | 'low' | 'high' | 'critical'): string {
+export function getStatusColor(status: TestStatus): string {
   switch (status) {
-    case 'normal': return 'Normal';
-    case 'low': return 'Low';
-    case 'high': return 'High';
-    case 'critical': return 'Critical';
-    default: return 'Normal';
+    case "normal": return "text-success-green bg-green-50 border-green-200";
+    case "high": return "text-warning-yellow bg-yellow-50 border-yellow-200";
+    case "low": return "text-warning-yellow bg-yellow-50 border-yellow-200";
+    case "critical": return "text-error-red bg-red-50 border-red-200";
+    default: return "text-gray-500 bg-gray-50 border-gray-200";
   }
 }
 
-export function getStatusColor(status: 'normal' | 'low' | 'high' | 'critical'): string {
+export function getStatusLabel(status: TestStatus): string {
   switch (status) {
-    case 'normal': return 'text-green-600 bg-green-50';
-    case 'low': return 'text-yellow-600 bg-yellow-50';
-    case 'high': return 'text-yellow-600 bg-yellow-50';
-    case 'critical': return 'text-red-600 bg-red-50';
-    default: return 'text-gray-600 bg-gray-50';
+    case "normal": return "Normal";
+    case "high": return "High";
+    case "low": return "Low";
+    case "critical": return "Critical";
+    default: return "Unknown";
   }
 }

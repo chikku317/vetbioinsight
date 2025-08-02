@@ -16,6 +16,8 @@ const criticalRanges = {
   // Liver function - critical values
   alt: { critical: { min: 0, max: 300 } }, // Very high ALT indicates severe liver damage
   ast: { critical: { min: 0, max: 400 } },
+  sgot: { critical: { min: 0, max: 500 } }, // Very high SGOT indicates severe liver damage  
+  sgpt: { critical: { min: 0, max: 400 } }, // Very high SGPT indicates severe liver damage
   alkp: { critical: { min: 0, max: 500 } },
   ggt: { critical: { min: 0, max: 150 } },
   bilirubin: { critical: { min: 0, max: 5.0 } },

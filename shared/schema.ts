@@ -57,6 +57,8 @@ export const testResultsSchema = z.object({
   alt: z.number().optional(),
   alp: z.number().optional(),
   ggt: z.number().optional(),
+  sgot: z.number().optional(), // Added SGOT
+  sgpt: z.number().optional(), // Added SGPT
   totalBilirubin: z.number().optional(),
   bilirubinUnit: z.enum(["mg/dl", "umol/l"]).default("mg/dl"),
   

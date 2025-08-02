@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { VetReport } from "@shared/schema";
-import headerImagePath from "@assets/Lab Header The PetNest_1754069909688.png";
+import headerImagePath from "@assets/The MAin Header_1754116167505.png";
 
 export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
   const pdf = new jsPDF();
@@ -88,6 +88,7 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
     [`Weight:`, `${report.weight || 'N/A'} ${report.weightUnit || ''}`],
     [`Collection Date:`, report.collectionDate || 'N/A'],
     [`Report Date:`, report.reportDate || 'N/A'],
+    [`Attending Veterinarian:`, report.attendingVeterinarian || 'N/A'],
   ];
 
   patientInfo.forEach(([label, value]) => {

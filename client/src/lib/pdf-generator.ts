@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import headerImagePath from "@assets/Lab Header The PetNest_1754069909688.png";
+import headerImagePath from "@assets/The MAin Header_1754116167505.png";
 import { VetReport, TestResults, Species } from "@shared/schema";
 import { referenceRanges, getTestStatus, getStatusLabel } from "./reference-ranges";
 import { generateClinicalInterpretations, generateOverallAssessment } from "./clinical-interpreter";
@@ -89,7 +89,7 @@ export function generateVetReportPDF(
     ["Patient Name:", report.patientName, "Species/Breed:", `${report.species.charAt(0).toUpperCase() + report.species.slice(1)}${report.breed ? ` / ${report.breed}` : ""}`],
     ["Parents Name:", report.parentsName || "N/A", "Medical Record:", report.medicalRecordNumber || "N/A"],
     ["Age/Weight:", `${report.age} ${report.ageUnit} / ${report.weight} ${report.weightUnit}`, "Collection Date:", report.collectionDate],
-    ["Veterinarian:", report.attendingVeterinarian, "Report Date:", report.reportDate]
+    ["Attending Veterinarian:", report.attendingVeterinarian || 'N/A', "Report Date:", report.reportDate]
   ];
 
   // Draw table with better alignment (simple clean table)
