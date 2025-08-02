@@ -32,7 +32,7 @@ function TestField({ form, testKey, label, unit, species, step = "1", className 
   
   let status: "normal" | "high" | "low" | "critical" = "normal";
   if (typeof testValue === 'number' && !isNaN(testValue)) {
-    status = getTestStatus(testValue, range as any);
+    status = getTestStatus(testKey, testValue, species);
   }
 
   const statusColor = getStatusColor(status);
