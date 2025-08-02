@@ -1,8 +1,8 @@
-# Veterinary Biochemistry Analyzer Report Application
+# Comprehensive Veterinary Laboratory Report Generator Application
 
 ## Overview
 
-This is a comprehensive web application for generating professional biochemistry analyzer reports for veterinary animals. The application allows veterinarians to collect patient information, input laboratory test results, and generate standardized clinical reports with automated interpretation and PDF export capabilities. The system supports multiple animal species with species-specific reference ranges and provides real-time validation of test values against normal parameters.
+This is a comprehensive multi-module web application for generating professional veterinary laboratory diagnostic reports. The application supports multiple types of veterinary examinations including biochemistry analysis, blood smears, wet films, skin scrapings, impression smears, ear swabs, faecal samples, and progesterone testing. The system allows veterinarians to collect standardized patient information, input examination-specific test results, upload and annotate images, and generate professional PDF reports with automated validation and species-specific reference ranges.
 
 ## User Preferences
 
@@ -12,17 +12,19 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 - **Framework**: React with TypeScript for type safety and component-based development
-- **Routing**: Wouter for lightweight client-side routing
+- **Routing**: Wouter for lightweight client-side routing with multi-module report type selection
 - **State Management**: React Hook Form for form state management with Zod validation schemas
 - **UI Framework**: Shadcn/ui components built on Radix UI primitives for accessibility and customization
 - **Styling**: Tailwind CSS with custom medical-themed color palette and CSS variables for theming
 - **Build Tool**: Vite for fast development and optimized production builds
+- **Multi-Module Design**: Dynamic report type selector with 8 different laboratory examination modules
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework for REST API endpoints
 - **Database Integration**: Drizzle ORM configured for PostgreSQL with type-safe schema definitions
 - **Data Storage**: Currently using in-memory storage (MemStorage) with interface for future database implementation
 - **API Design**: RESTful endpoints for CRUD operations on veterinary reports
+- **Multi-Report Support**: Single schema supporting multiple report types with union types for test results
 
 ### Form Management & Validation
 - **Schema Validation**: Zod schemas for runtime type checking and form validation
