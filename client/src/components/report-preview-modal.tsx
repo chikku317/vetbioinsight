@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { VetReport, TestResults, Species } from "@shared/schema";
-import { referenceRanges, getTestStatus, getStatusLabel } from "@/lib/reference-ranges";
+import { referenceRanges, getTestStatus, getStatusLabel, SpeciesReferenceRanges } from "@/lib/reference-ranges";
 import { generateVetReportPDF } from "@/lib/pdf-generator";
 import { generateSimplifiedReportPDF } from "@/lib/simplified-pdf-generator";
 import { Eye, Download } from "lucide-react";
@@ -109,12 +109,12 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
               {panel.tests.map((test, testIndex) => {
                 const value = testResults?.[test.key as keyof TestResults];
                 // Only show tests that have values
-                if (value === undefined || value === null || value === "" || String(value).trim() === "") {
+                if (value === undefined || value === null || (typeof value === "string" && value.trim() === "")) {
                   return null;
                 }
                 
                 const numericValue = Number(value);
-                const status = !isNaN(numericValue) ? getTestStatus(numericValue, test.range) : "normal";
+                const status = !isNaN(numericValue) ? getTestStatus(test.key as keyof SpeciesReferenceRanges, numericValue, species) : "normal";
                 const statusLabel = getStatusLabel(status);
                 
                 return (

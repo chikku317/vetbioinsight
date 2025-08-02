@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UseFormReturn } from "react-hook-form";
 import { InsertVetReport, TestResults, Species } from "@shared/schema";
-import { referenceRanges, getTestStatus, getStatusColor, getStatusLabel } from "@/lib/reference-ranges";
+import { referenceRanges, getTestStatus, getStatusColor, getStatusLabel, SpeciesReferenceRanges } from "@/lib/reference-ranges";
 import { generateClinicalInterpretations } from "@/lib/clinical-interpreter";
 import { Activity, Cat, Zap, Dna, Clock, FileText } from "lucide-react";
 
@@ -17,7 +17,7 @@ interface TestResultPanelProps {
 
 interface TestFieldProps {
   form: UseFormReturn<InsertVetReport>;
-  testKey: keyof TestResults;
+  testKey: keyof SpeciesReferenceRanges;
   label: string;
   unit?: string;
   species: Species;
@@ -27,7 +27,7 @@ interface TestFieldProps {
 
 function TestField({ form, testKey, label, unit, species, step = "1", className = "" }: TestFieldProps) {
   const ranges = referenceRanges[species];
-  const range = ranges[testKey as keyof typeof ranges];
+  const range = ranges[testKey];
   const testValue = form.watch(`testResults.${testKey}`);
   
   let status: "normal" | "high" | "low" | "critical" = "normal";
@@ -59,7 +59,7 @@ function TestField({ form, testKey, label, unit, species, step = "1", className 
                 <Input
                   type="number"
                   step={step}
-                  placeholder={range.min.toString()}
+                  placeholder={range?.min.toString() || "0"}
                   className={typeof testValue === 'number' && !isNaN(testValue) && status !== "normal" 
                     ? status === "critical" ? "border-red-300 focus:ring-error-red" : "border-yellow-300 focus:ring-warning-yellow"
                     : ""
@@ -75,9 +75,11 @@ function TestField({ form, testKey, label, unit, species, step = "1", className 
         {unit && <span className="text-sm text-gray-500">{unit}</span>}
       </div>
       
-      <div className="text-xs text-medical-gray mt-2">
-        Reference: {range.min}-{range.max} {range.unit} ({species.charAt(0).toUpperCase() + species.slice(1)})
-      </div>
+      {range && (
+        <div className="text-xs text-medical-gray mt-2">
+          Reference: {range.min}-{range.max} {range.unit} ({species.charAt(0).toUpperCase() + species.slice(1)})
+        </div>
+      )}
     </div>
   );
 }
