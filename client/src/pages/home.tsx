@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useVetForm } from "@/hooks/use-vet-form";
 import { ProgressIndicator } from "@/components/progress-indicator";
 import { PatientInfoPanel } from "@/components/patient-info-panel";
-import { TestResultPanel } from "@/components/test-result-panel";
+import { TestResultPanelRouter } from "@/components/test-result-panel-router";
 import { ReportPreviewModal } from "@/components/report-preview-modal";
 import { ReportTypeSelector } from "@/components/report-type-selector";
 import { generateVetReportPDF } from "@/lib/pdf-generator";
@@ -323,7 +323,7 @@ export default function Home() {
 
               {/* Right Column: Test Results */}
               <div className="lg:col-span-2">
-                <TestResultPanel form={form} />
+                <TestResultPanelRouter reportType={selectedReportType} form={form} />
               </div>
 
             </div>

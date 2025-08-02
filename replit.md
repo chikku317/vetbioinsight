@@ -2,7 +2,18 @@
 
 ## Overview
 
-This is a comprehensive multi-module web application for generating professional veterinary laboratory diagnostic reports. The application supports multiple types of veterinary examinations including biochemistry analysis, blood smears, wet films, skin scrapings, impression smears, ear swabs, faecal samples, and progesterone testing. The system allows veterinarians to collect standardized patient information, input examination-specific test results, upload and annotate images, and generate professional PDF reports with automated validation and species-specific reference ranges.
+This is a comprehensive multi-module web application for generating professional veterinary laboratory diagnostic reports. The application supports 8 different types of veterinary examinations with specialized forms and validation for each module:
+
+1. **Biochemistry Analysis** - Complete blood chemistry panels with reference ranges
+2. **Blood Smear** - Microscopic blood cell examination and parasite detection
+3. **Wet Film** - Direct microscopic examination of fresh samples
+4. **Skin Scraping** - Mite and fungal analysis with depth specifications
+5. **Impression Smear** - Cytological examination of lesions and discharge
+6. **Ear Swab** - Comprehensive ear discharge analysis with odor assessment
+7. **Faecal Sample** - Complete parasitological and microbiological analysis
+8. **Progesterone** - Reproductive hormone testing with automatic breeding recommendations
+
+Each module features specialized input forms, field-specific validation, clinical reference ranges, and generates professional PDF reports with ThePetNest branding.
 
 ## User Preferences
 
@@ -17,7 +28,9 @@ Preferred communication style: Simple, everyday language.
 - **UI Framework**: Shadcn/ui components built on Radix UI primitives for accessibility and customization
 - **Styling**: Tailwind CSS with custom medical-themed color palette and CSS variables for theming
 - **Build Tool**: Vite for fast development and optimized production builds
-- **Multi-Module Design**: Dynamic report type selector with 8 different laboratory examination modules
+- **Multi-Module Design**: Dynamic report type selector with 8 specialized laboratory examination modules
+- **Dynamic Form Loading**: TestResultPanelRouter component dynamically loads specialized panels based on selected report type
+- **Specialized Test Panels**: Each report type has dedicated form components with field-specific inputs (dropdowns, checkboxes, number inputs)
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js framework for REST API endpoints
