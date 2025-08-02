@@ -1,18 +1,59 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Droplets } from "lucide-react";
+import { Droplets, Upload, X } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
+import { useState } from "react";
 
 interface WetFilmPanelProps {
   form: UseFormReturn<any>;
 }
 
 export function WetFilmPanel({ form }: WetFilmPanelProps) {
-  const testResults = form.watch("testResults") || {};
-  const cellsPresent = testResults.cellsPresent || [];
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        const maxWidth = 1920;
+        const maxHeight = 1080;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        const optimizedImageUrl = canvas.toDataURL('image/jpeg', 0.92);
+        setUploadedImage(optimizedImageUrl);
+        form.setValue('images', [optimizedImageUrl]);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage(null);
+    form.setValue('images', []);
+  };
 
   return (
     <div className="space-y-6">
@@ -29,165 +70,80 @@ export function WetFilmPanel({ form }: WetFilmPanelProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Sample Type */}
+          {/* Observation */}
           <FormField
             control={form.control}
-            name="testResults.sampleType"
+            name="observation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sample Type</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select sample type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Urine">Urine</SelectItem>
-                    <SelectItem value="Vaginal discharge">Vaginal discharge</SelectItem>
-                    <SelectItem value="Ear discharge">Ear discharge</SelectItem>
-                    <SelectItem value="Other">Other fluid</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel>Observation</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Enter your clinical observations..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Bacteria */}
-            <FormField
-              control={form.control}
-              name="testResults.bacteria"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bacteria</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select bacterial findings" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="None">None detected</SelectItem>
-                      <SelectItem value="Cocci">Cocci</SelectItem>
-                      <SelectItem value="Bacilli">Bacilli</SelectItem>
-                      <SelectItem value="Mixed">Mixed bacteria</SelectItem>
-                      <SelectItem value="Other">Other morphology</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Yeast/Fungi */}
-            <FormField
-              control={form.control}
-              name="testResults.yeastFungi"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Yeast/Fungi</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select fungal findings" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="None detected">None detected</SelectItem>
-                      <SelectItem value="Candida">Candida spp.</SelectItem>
-                      <SelectItem value="Malassezia">Malassezia spp.</SelectItem>
-                      <SelectItem value="Other">Other fungi</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Parasites */}
+          {/* Advice */}
           <FormField
             control={form.control}
-            name="testResults.parasites"
+            name="advice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Parasites</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select parasite findings" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="None detected">None detected</SelectItem>
-                    <SelectItem value="Trichomonas">Trichomonas spp.</SelectItem>
-                    <SelectItem value="Other">Other parasites</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel>Advice</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Enter your clinical advice and recommendations..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Cells Present */}
-          <FormField
-            control={form.control}
-            name="testResults.cellsPresent"
-            render={() => (
-              <FormItem>
-                <FormLabel>Cells Present</FormLabel>
-                <div className="grid grid-cols-2 gap-3">
-                  {["Epithelial cells", "WBCs", "RBCs", "Other"].map((cell) => (
-                    <FormField
-                      key={cell}
-                      control={form.control}
-                      name="testResults.cellsPresent"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={cell}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(cell)}
-                                onCheckedChange={(checked) => {
-                                  const currentValue = field.value || [];
-                                  return checked
-                                    ? field.onChange([...currentValue, cell])
-                                    : field.onChange(
-                                        currentValue?.filter((value: string) => value !== cell)
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {cell}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
+          {/* Image Upload */}
+          <div className="space-y-3">
+            <FormLabel>Specimen Image</FormLabel>
+            {!uploadedImage ? (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm text-gray-600 mb-2">Click to upload specimen image</p>
+                <p className="text-xs text-gray-500">Optimized for maximum clarity</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <Button type="button" variant="outline" className="mt-2">
+                  Choose Image
+                </Button>
+              </div>
+            ) : (
+              <div className="relative">
+                <img 
+                  src={uploadedImage} 
+                  alt="Specimen" 
+                  className="w-full max-w-md rounded-lg border shadow-sm"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={removeImage}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             )}
-          />
-
-          {/* Clinical Significance */}
-          <div className="bg-cyan-50 dark:bg-cyan-900/20 p-4 rounded-lg">
-            <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Badge variant="outline">Clinical Significance</Badge>
-            </h4>
-            <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
-              <div><strong>Bacteria:</strong> Indicates bacterial infection or contamination</div>
-              <div><strong>Yeast:</strong> Common in otitis externa, skin infections</div>
-              <div><strong>WBCs:</strong> Inflammatory response present</div>
-              <div><strong>Trichomonas:</strong> Sexually transmitted parasite</div>
-            </div>
           </div>
         </CardContent>
       </Card>

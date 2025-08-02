@@ -1,19 +1,59 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Activity } from "lucide-react";
+import { Activity, Upload, X } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
+import { useState } from "react";
 
 interface ImpressionSmearPanelProps {
   form: UseFormReturn<any>;
 }
 
 export function ImpressionSmearPanel({ form }: ImpressionSmearPanelProps) {
-  const testResults = form.watch("testResults") || {};
-  const cellTypesObserved = testResults.cellTypesObserved || [];
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        const maxWidth = 1920;
+        const maxHeight = 1080;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        const optimizedImageUrl = canvas.toDataURL('image/jpeg', 0.92);
+        setUploadedImage(optimizedImageUrl);
+        form.setValue('images', [optimizedImageUrl]);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage(null);
+    form.setValue('images', []);
+  };
 
   return (
     <div className="space-y-6">
@@ -30,16 +70,17 @@ export function ImpressionSmearPanel({ form }: ImpressionSmearPanelProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Sample Source */}
+          {/* Observation */}
           <FormField
             control={form.control}
-            name="testResults.sampleSource"
+            name="observation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sample Source</FormLabel>
+                <FormLabel>Observation</FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder="e.g., Wound discharge, Mass aspirate, Skin lesion"
+                  <Textarea 
+                    placeholder="Enter your clinical observations..."
+                    className="min-h-[100px]"
                     {...field}
                   />
                 </FormControl>
@@ -48,140 +89,61 @@ export function ImpressionSmearPanel({ form }: ImpressionSmearPanelProps) {
             )}
           />
 
-          {/* Cell Types Observed */}
+          {/* Advice */}
           <FormField
             control={form.control}
-            name="testResults.cellTypesObserved"
-            render={() => (
-              <FormItem>
-                <FormLabel>Cell Types Observed</FormLabel>
-                <div className="grid grid-cols-2 gap-3">
-                  {["Neutrophils", "Macrophages", "Lymphocytes", "Plasma cells", "Other"].map((cellType) => (
-                    <FormField
-                      key={cellType}
-                      control={form.control}
-                      name="testResults.cellTypesObserved"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={cellType}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(cellType)}
-                                onCheckedChange={(checked) => {
-                                  const currentValue = field.value || [];
-                                  return checked
-                                    ? field.onChange([...currentValue, cellType])
-                                    : field.onChange(
-                                        currentValue?.filter((value: string) => value !== cellType)
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {cellType}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Bacteria Present */}
-            <FormField
-              control={form.control}
-              name="testResults.bacteriaPresent"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bacteria Present</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select bacterial location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="None">None</SelectItem>
-                      <SelectItem value="Intracellular">Intracellular</SelectItem>
-                      <SelectItem value="Extracellular">Extracellular</SelectItem>
-                      <SelectItem value="Mixed">Mixed (intra & extracellular)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Malignant Cells */}
-            <FormField
-              control={form.control}
-              name="testResults.malignantCells"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Malignant Cells</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select malignancy status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Not detected">Not detected</SelectItem>
-                      <SelectItem value="Suspected">Suspected</SelectItem>
-                      <SelectItem value="Present">Present</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Inflammatory Pattern */}
-          <FormField
-            control={form.control}
-            name="testResults.inflammatoryPattern"
+            name="advice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Inflammatory Pattern</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select inflammatory pattern" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Acute">Acute inflammation</SelectItem>
-                    <SelectItem value="Chronic">Chronic inflammation</SelectItem>
-                    <SelectItem value="Granulomatous">Granulomatous inflammation</SelectItem>
-                    <SelectItem value="Mixed">Mixed pattern</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel>Advice</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Enter your clinical advice and recommendations..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Diagnostic Guidelines */}
-          <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-            <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Badge variant="outline">Interpretation Guidelines</Badge>
-            </h4>
-            <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
-              <div><strong>Neutrophils dominant:</strong> Acute bacterial infection</div>
-              <div><strong>Macrophages dominant:</strong> Chronic inflammation or foreign body</div>
-              <div><strong>Intracellular bacteria:</strong> Active phagocytosis, viable organisms</div>
-              <div><strong>Granulomatous:</strong> Consider mycobacterial, fungal, or foreign body</div>
-              <div><strong>Atypical cells:</strong> Require histopathology for definitive diagnosis</div>
-            </div>
+          {/* Image Upload */}
+          <div className="space-y-3">
+            <FormLabel>Specimen Image</FormLabel>
+            {!uploadedImage ? (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm text-gray-600 mb-2">Click to upload specimen image</p>
+                <p className="text-xs text-gray-500">Optimized for maximum clarity</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <Button type="button" variant="outline" className="mt-2">
+                  Choose Image
+                </Button>
+              </div>
+            ) : (
+              <div className="relative">
+                <img 
+                  src={uploadedImage} 
+                  alt="Specimen" 
+                  className="w-full max-w-md rounded-lg border shadow-sm"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={removeImage}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

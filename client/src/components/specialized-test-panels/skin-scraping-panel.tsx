@@ -1,19 +1,59 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Scissors } from "lucide-react";
+import { Scissors, Upload, X } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
+import { useState } from "react";
 
 interface SkinScrapingPanelProps {
   form: UseFormReturn<any>;
 }
 
 export function SkinScrapingPanel({ form }: SkinScrapingPanelProps) {
-  const testResults = form.watch("testResults") || {};
-  const secondaryInfections = testResults.secondaryInfections || [];
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        const maxWidth = 1920;
+        const maxHeight = 1080;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        const optimizedImageUrl = canvas.toDataURL('image/jpeg', 0.92);
+        setUploadedImage(optimizedImageUrl);
+        form.setValue('images', [optimizedImageUrl]);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage(null);
+    form.setValue('images', []);
+  };
 
   return (
     <div className="space-y-6">
@@ -30,157 +70,80 @@ export function SkinScrapingPanel({ form }: SkinScrapingPanelProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Scraping Site */}
-            <FormField
-              control={form.control}
-              name="testResults.scrapingSite"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Scraping Site</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="e.g., Left ear margin, Elbow lesion"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Scraping Depth */}
-            <FormField
-              control={form.control}
-              name="testResults.scrapingDepth"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Scraping Depth</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select depth" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Superficial">Superficial</SelectItem>
-                      <SelectItem value="Deep">Deep (until capillary bleeding)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Mites Detected */}
+          {/* Observation */}
           <FormField
             control={form.control}
-            name="testResults.mitesDetected"
+            name="observation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mites Detected</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select mite findings" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="None">None detected</SelectItem>
-                    <SelectItem value="Demodex">Demodex spp.</SelectItem>
-                    <SelectItem value="Sarcoptes">Sarcoptes scabiei</SelectItem>
-                    <SelectItem value="Cheyletiella">Cheyletiella spp.</SelectItem>
-                    <SelectItem value="Other">Other mites</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel>Observation</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Enter your clinical observations..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Fungal Elements */}
+          {/* Advice */}
           <FormField
             control={form.control}
-            name="testResults.fungalElements"
+            name="advice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fungal Elements</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select fungal findings" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="None">None detected</SelectItem>
-                    <SelectItem value="Dermatophytes">Dermatophytes</SelectItem>
-                    <SelectItem value="Spores">Fungal spores</SelectItem>
-                    <SelectItem value="Hyphae">Fungal hyphae</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel>Advice</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Enter your clinical advice and recommendations..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Secondary Infections */}
-          <FormField
-            control={form.control}
-            name="testResults.secondaryInfections"
-            render={() => (
-              <FormItem>
-                <FormLabel>Secondary Infections</FormLabel>
-                <div className="grid grid-cols-2 gap-3">
-                  {["Bacterial", "Yeast"].map((infection) => (
-                    <FormField
-                      key={infection}
-                      control={form.control}
-                      name="testResults.secondaryInfections"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={infection}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(infection)}
-                                onCheckedChange={(checked) => {
-                                  const currentValue = field.value || [];
-                                  return checked
-                                    ? field.onChange([...currentValue, infection])
-                                    : field.onChange(
-                                        currentValue?.filter((value: string) => value !== infection)
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {infection} infection
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
+          {/* Image Upload */}
+          <div className="space-y-3">
+            <FormLabel>Specimen Image</FormLabel>
+            {!uploadedImage ? (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm text-gray-600 mb-2">Click to upload specimen image</p>
+                <p className="text-xs text-gray-500">Optimized for maximum clarity</p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <Button type="button" variant="outline" className="mt-2">
+                  Choose Image
+                </Button>
+              </div>
+            ) : (
+              <div className="relative">
+                <img 
+                  src={uploadedImage} 
+                  alt="Specimen" 
+                  className="w-full max-w-md rounded-lg border shadow-sm"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={removeImage}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             )}
-          />
-
-          {/* Diagnostic Information */}
-          <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
-            <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Badge variant="outline">Diagnostic Guidelines</Badge>
-            </h4>
-            <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
-              <div><strong>Demodex:</strong> Deep scraping required, normal in small numbers</div>
-              <div><strong>Sarcoptes:</strong> Highly contagious, may be difficult to find</div>
-              <div><strong>Cheyletiella:</strong> "Walking dandruff", superficial scraping</div>
-              <div><strong>Deep scraping:</strong> Until capillary bleeding occurs</div>
-            </div>
           </div>
         </CardContent>
       </Card>

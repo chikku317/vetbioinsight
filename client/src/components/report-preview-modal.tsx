@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { VetReport, TestResults, Species } from "@shared/schema";
 import { referenceRanges, getTestStatus, getStatusLabel } from "@/lib/reference-ranges";
 import { generateVetReportPDF } from "@/lib/pdf-generator";
+import { generateSimplifiedReportPDF } from "@/lib/simplified-pdf-generator";
 import { Eye, Download } from "lucide-react";
 import { useState } from "react";
 
@@ -17,8 +18,17 @@ export function ReportPreviewModal({ report, trigger }: ReportPreviewModalProps)
   
   const handleDownloadPDF = () => {
     try {
-      const pdf = generateVetReportPDF(report);
-      const filename = `BIOCHEMISTRY ANALYSIS REPORT_${report.patientName || 'Patient'}_${report.parentsName || 'Owner'}_${report.collectionDate || report.reportDate}.pdf`;
+      // Use appropriate PDF generator based on report type
+      const pdf = report.reportType === 'biochemistry' 
+        ? generateVetReportPDF(report)
+        : generateSimplifiedReportPDF(report);
+      
+      // New naming convention: LABTEST NAME_NAME OF PARENT_PATIENT NAME_DATE
+      const labTestName = report.reportType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Laboratory Report';
+      const parentName = report.parentsName || 'Unknown';
+      const patientName = report.patientName || 'Unknown';
+      const currentDate = new Date().toISOString().split('T')[0];
+      const filename = `${labTestName}_${parentName}_${patientName}_${currentDate}.pdf`;
       pdf.save(filename);
     } catch (error) {
       console.error("Error generating PDF:", error);

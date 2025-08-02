@@ -10,6 +10,7 @@ import { TestResultPanelRouter } from "@/components/test-result-panel-router";
 import { ReportPreviewModal } from "@/components/report-preview-modal";
 import { ReportTypeSelector } from "@/components/report-type-selector";
 import { generateVetReportPDF } from "@/lib/pdf-generator";
+import { generateSimplifiedReportPDF } from "@/lib/simplified-pdf-generator";
 import { Microscope, FileText, Download, Eye, CheckCircle, AlertTriangle, Info, ArrowLeft } from "lucide-react";
 import { VetReport, ReportType } from "@shared/schema";
 
@@ -245,22 +246,40 @@ export default function Home() {
       id: "temp-preview",
       reportType: selectedReportType || "biochemistry",
       createdAt: new Date().toISOString().split('T')[0],
-      ...formData,
+      patientName: formData.patientName,
       parentsName: formData.parentsName || null,
+      species: formData.species as Species,
       breed: formData.breed || null,
+      age: formData.age,
+      ageUnit: formData.ageUnit || 'years',
+      weight: formData.weight,
+      weightUnit: formData.weightUnit,
       medicalRecordNumber: formData.medicalRecordNumber || null,
-      observation: null,
-      advice: null,
-      notes: null,
-      images: null,
+      collectionDate: formData.collectionDate,
+      reportDate: formData.reportDate,
+      testResults: formData.testResults,
+      observation: formData.observation || null,
+      advice: formData.advice || null,
+      notes: formData.notes || null,
+      images: formData.images || null,
       clinicalNotes: formData.clinicalNotes || null,
     };
   };
 
   const handleGeneratePDF = () => {
     const tempReport = createTempReport();
-    const pdf = generateVetReportPDF(tempReport);
-    const filename = `BIOCHEMISTRY ANALYSIS REPORT_${tempReport.patientName || 'Patient'}_${tempReport.parentsName || 'Owner'}_${tempReport.collectionDate || tempReport.reportDate}.pdf`;
+    
+    // Use appropriate PDF generator based on report type
+    const pdf = selectedReportType === 'biochemistry' 
+      ? generateVetReportPDF(tempReport)
+      : generateSimplifiedReportPDF(tempReport);
+    
+    // New naming convention: LABTEST NAME_NAME OF PARENT_PATIENT NAME_DATE
+    const labTestName = selectedReportType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Laboratory Report';
+    const parentName = tempReport.parentsName || 'Unknown';
+    const patientName = tempReport.patientName || 'Unknown';
+    const currentDate = new Date().toISOString().split('T')[0];
+    const filename = `${labTestName}_${parentName}_${patientName}_${currentDate}.pdf`;
     pdf.save(filename);
   };
 

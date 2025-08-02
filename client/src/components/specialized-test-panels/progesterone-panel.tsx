@@ -1,6 +1,7 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
@@ -13,17 +14,6 @@ interface ProgesteronePanelProps {
 export function ProgesteronePanel({ form }: ProgesteronePanelProps) {
   const testResults = form.watch("testResults") || {};
   const progesteroneLevel = testResults.progesteroneLevel;
-
-  const getBreedingInterpretation = (level: number) => {
-    if (!level) return null;
-    if (level < 2) return { status: "Pre-LH surge", color: "bg-blue-100 text-blue-800" };
-    if (level >= 2 && level < 5) return { status: "LH surge occurring", color: "bg-yellow-100 text-yellow-800" };
-    if (level >= 5 && level < 8) return { status: "Optimal breeding time", color: "bg-green-100 text-green-800" };
-    if (level >= 8) return { status: "Post-ovulation", color: "bg-red-100 text-red-800" };
-    return null;
-  };
-
-  const interpretation = progesteroneLevel ? getBreedingInterpretation(progesteroneLevel) : null;
 
   return (
     <div className="space-y-6">
@@ -61,71 +51,13 @@ export function ProgesteronePanel({ form }: ProgesteronePanelProps) {
             )}
           />
 
-          {/* Automatic Interpretation */}
-          {interpretation && (
-            <div className={`p-3 rounded-lg ${interpretation.color}`}>
-              <div className="font-medium text-sm">Breeding Status: {interpretation.status}</div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Testing Method */}
-            <FormField
-              control={form.control}
-              name="testResults.testingMethod"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Testing Method</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select method" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="ELISA">ELISA</SelectItem>
-                      <SelectItem value="Chemiluminescence">Chemiluminescence</SelectItem>
-                      <SelectItem value="RIA">Radioimmunoassay (RIA)</SelectItem>
-                      <SelectItem value="Other">Other method</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Sample Quality */}
-            <FormField
-              control={form.control}
-              name="testResults.sampleQuality"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sample Quality</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select quality" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Adequate">Adequate</SelectItem>
-                      <SelectItem value="Suboptimal">Suboptimal</SelectItem>
-                      <SelectItem value="Poor">Poor</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Breeding Advice */}
+          {/* Advice Selection */}
           <FormField
             control={form.control}
-            name="testResults.breedingAdvice"
+            name="advice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Breeding Recommendation</FormLabel>
+                <FormLabel>Advice</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -133,8 +65,8 @@ export function ProgesteronePanel({ form }: ProgesteronePanelProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Proceed">Proceed with breeding</SelectItem>
-                    <SelectItem value="Retest">Retest in 24-48 hours</SelectItem>
+                    <SelectItem value="Proceed">Proceed</SelectItem>
+                    <SelectItem value="Retest">Retest</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -142,16 +74,62 @@ export function ProgesteronePanel({ form }: ProgesteronePanelProps) {
             )}
           />
 
-          {/* Reference Ranges */}
+          {/* Doctor Notes */}
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Doctor Notes</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    placeholder="Enter any miscellaneous notes..."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Reference Range Table */}
           <div className="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg">
-            <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Badge variant="outline">Breeding Timeline</Badge>
+            <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+              <Badge variant="outline">Reference Range for Dogs</Badge>
             </h4>
-            <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
-              <div><strong>&lt; 2.0 ng/mL:</strong> Pre-LH surge (continue testing)</div>
-              <div><strong>2.0-5.0 ng/mL:</strong> LH surge occurring (breed in 24-48h)</div>
-              <div><strong>5.0-8.0 ng/mL:</strong> Optimal breeding window</div>
-              <div><strong>&gt; 8.0 ng/mL:</strong> Post-ovulation (breeding window may be closing)</div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="border-b">
+                  <tr>
+                    <th className="text-left py-2 px-3">Progesterone Level</th>
+                    <th className="text-left py-2 px-3">Breeding Status</th>
+                    <th className="text-left py-2 px-3">Recommendation</th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-600 dark:text-gray-300">
+                  <tr className="border-b">
+                    <td className="py-2 px-3">&lt; 2.0 ng/mL</td>
+                    <td className="py-2 px-3">Pre-LH surge</td>
+                    <td className="py-2 px-3">Continue testing</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 px-3">2.0-5.0 ng/mL</td>
+                    <td className="py-2 px-3">LH surge occurring</td>
+                    <td className="py-2 px-3">Breed in 24-48h</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2 px-3">5.0-8.0 ng/mL</td>
+                    <td className="py-2 px-3">Optimal breeding window</td>
+                    <td className="py-2 px-3">Proceed with breeding</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 px-3">&gt; 8.0 ng/mL</td>
+                    <td className="py-2 px-3">Post-ovulation</td>
+                    <td className="py-2 px-3">Window may be closing</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </CardContent>
