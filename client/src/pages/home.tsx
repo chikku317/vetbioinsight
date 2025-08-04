@@ -12,25 +12,56 @@ import { ReportTypeSelector } from "@/components/report-type-selector";
 import { generateVetReportPDF } from "@/lib/pdf-generator";
 import { generateSimplifiedReportPDF } from "@/lib/simplified-pdf-generator";
 import { WhatsAppShare } from "@/components/whatsapp-share";
-import { Microscope, FileText, Download, Eye, CheckCircle, AlertTriangle, Info, ArrowLeft } from "lucide-react";
+import { Microscope, FileText, Download, Eye, CheckCircle, AlertTriangle, Info, ArrowLeft, LogOut, User, Users } from "lucide-react";
 import { VetReport, ReportType, Species } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Home() {
   const { form, progress, isLoading, onSubmit, getAbnormalTestCount } = useVetForm();
   const [currentTab, setCurrentTab] = useState<"patient" | "tests">("patient");
   const [selectedReportType, setSelectedReportType] = useState<ReportType | null>(null);
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    window.location.reload();
+  };
 
   // If no report type is selected, show the selector
   if (!selectedReportType) {
     return (
       <div className="min-h-screen bg-clinical-bg p-6">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Veterinary Laboratory Report Generator
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Select the type of laboratory examination report you want to generate.
-          </p>
+        {/* Header with user info */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Veterinary Laboratory Report Generator
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Select the type of laboratory examination report you want to generate.
+            </p>
+          </div>
+          
+          {/* User menu */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <User className="h-4 w-4" />
+              <span>{user?.fullName}</span>
+              {user?.role === 'admin' && (
+                <Badge variant="default" className="text-xs">Admin</Badge>
+              )}
+            </div>
+            {user?.role === 'admin' && (
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/admin'}>
+                <Users className="h-4 w-4 mr-2" />
+                Admin Panel
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
