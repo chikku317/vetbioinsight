@@ -1,7 +1,8 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, decimal, date, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, decimal, date, boolean, jsonb, timestamp, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 // Report Types
 export const REPORT_TYPES = {
@@ -17,9 +18,23 @@ export const REPORT_TYPES = {
 
 export type ReportType = typeof REPORT_TYPES[keyof typeof REPORT_TYPES];
 
+// Users table for authentication
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
+  password: text("password").notNull(),
+  role: text("role").notNull().default("user"), // "user", "admin"
+  fullName: text("full_name").notNull(),
+  email: varchar("email", { length: 100 }).unique(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const vetReports = pgTable("vet_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reportType: text("report_type").notNull().default("biochemistry"),
+  createdBy: serial("created_by").notNull().references(() => users.id),
   patientName: text("patient_name").notNull(),
   parentsName: text("parents_name"),
   species: text("species").notNull(),
@@ -51,8 +66,37 @@ export const vetReports = pgTable("vet_reports", {
   clinicalNotesEnabled: boolean("clinical_notes_enabled").default(false),
   
   // Report metadata
-  createdAt: date("created_at").default(sql`CURRENT_DATE`),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Sessions table for authentication
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: serial("user_id").notNull().references(() => users.id),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  reports: many(vetReports),
+  sessions: many(sessions),
+}));
+
+export const vetReportsRelations = relations(vetReports, ({ one }) => ({
+  createdBy: one(users, {
+    fields: [vetReports.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
 
 export const testResultsSchema = z.object({
   // Hepatic Function Panel
@@ -161,9 +205,23 @@ export const progesteroneResultsSchema = z.object({
 });
 
 // Now create the insert schema with proper references
+// Auth schemas
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
 export const insertVetReportSchema = createInsertSchema(vetReports).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+  createdBy: true,
 }).extend({
   reportType: z.enum(["biochemistry", "blood_smear", "wet_film", "skin_scraping", "impression_smear", "ear_swab", "faecal_sample", "progesterone"]).default("biochemistry"),
   testResults: z.union([
@@ -188,6 +246,12 @@ export const insertVetReportSchema = createInsertSchema(vetReports).omit({
   clinicalNotes: z.string().optional().nullable(),
   clinicalNotesEnabled: z.boolean().default(false),
 });
+
+// Type exports
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type LoginCredentials = z.infer<typeof loginSchema>;
+export type Session = typeof sessions.$inferSelect;
 
 export type InsertVetReport = z.infer<typeof insertVetReportSchema>;
 export type VetReport = typeof vetReports.$inferSelect;
