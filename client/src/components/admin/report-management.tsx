@@ -20,7 +20,7 @@ export function ReportManagement() {
 
   const deleteReportMutation = useMutation({
     mutationFn: async (reportId: string) => {
-      return apiRequest(`/api/vet-reports/${reportId}`, { method: "DELETE" });
+      return apiRequest("DELETE", `/api/vet-reports/${reportId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vet-reports"] });

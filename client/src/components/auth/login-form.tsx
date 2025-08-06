@@ -31,13 +31,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setError(null);
 
     try {
-      await apiRequest("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await apiRequest("POST", "/api/auth/login", data);
       
       onSuccess();
     } catch (err: any) {

@@ -39,11 +39,7 @@ export function UserManagement() {
 
   const createUserMutation = useMutation({
     mutationFn: async (userData: InsertUser) => {
-      return apiRequest("/api/users", {
-        method: "POST",
-        body: JSON.stringify(userData),
-        headers: { "Content-Type": "application/json" },
-      });
+      return apiRequest("POST", "/api/users", userData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
@@ -65,7 +61,7 @@ export function UserManagement() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      return apiRequest(`/api/users/${userId}`, { method: "DELETE" });
+      return apiRequest("DELETE", `/api/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });

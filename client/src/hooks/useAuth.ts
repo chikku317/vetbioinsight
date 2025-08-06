@@ -22,7 +22,7 @@ export const useAuth = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
-      await apiRequest('/api/auth/logout', { method: 'POST' });
+      await apiRequest('POST', '/api/auth/logout');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -32,7 +32,7 @@ export const useAuth = create<AuthState>((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const response = await apiRequest('/api/auth/me');
+      const response = await apiRequest('GET', '/api/auth/me');
       const data = await response.json();
       if (data.user) {
         set({ user: data.user, isAuthenticated: true, isLoading: false });
