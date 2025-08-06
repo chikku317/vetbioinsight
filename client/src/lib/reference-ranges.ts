@@ -38,6 +38,11 @@ export interface SpeciesReferenceRanges {
   cholesterol: ReferenceRange;
   phosphorus: ReferenceRange;
   calcium: ReferenceRange;
+  
+  // Thyroid Function Panel
+  t3: ReferenceRange;
+  t4: ReferenceRange;
+  tsh: ReferenceRange;
 }
 
 export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
@@ -62,6 +67,9 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     cholesterol: { min: 112, max: 320, unit: "mg/dL", criticalHigh: 500 },
     phosphorus: { min: 2.6, max: 6.2, unit: "mg/dL", criticalHigh: 10.0 },
     calcium: { min: 9.1, max: 11.7, unit: "mg/dL", criticalLow: 7.0, criticalHigh: 14.0 },
+    t3: { min: 1.2, max: 2.8, unit: "nmol/L", criticalLow: 0.8, criticalHigh: 4.0 },
+    t4: { min: 15, max: 50, unit: "nmol/L", criticalLow: 10, criticalHigh: 80 },
+    tsh: { min: 0.03, max: 0.6, unit: "ng/mL", criticalLow: 0.01, criticalHigh: 1.0 },
   },
   cat: {
     alt: { min: 10, max: 80, unit: "U/L", criticalHigh: 150 },
@@ -84,6 +92,9 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     cholesterol: { min: 82, max: 218, unit: "mg/dL", criticalHigh: 350 },
     phosphorus: { min: 3.1, max: 7.0, unit: "mg/dL", criticalHigh: 12.0 },
     calcium: { min: 8.2, max: 10.8, unit: "mg/dL", criticalLow: 6.5, criticalHigh: 13.0 },
+    t3: { min: 1.0, max: 2.5, unit: "nmol/L", criticalLow: 0.6, criticalHigh: 3.5 },
+    t4: { min: 12, max: 45, unit: "nmol/L", criticalLow: 8, criticalHigh: 70 },
+    tsh: { min: 0.02, max: 0.5, unit: "ng/mL", criticalLow: 0.01, criticalHigh: 0.8 },
   },
   horse: {
     alt: { min: 3, max: 23, unit: "U/L", criticalHigh: 50 },
@@ -106,6 +117,9 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     cholesterol: { min: 75, max: 150, unit: "mg/dL", criticalHigh: 250 },
     phosphorus: { min: 1.0, max: 4.0, unit: "mg/dL", criticalHigh: 7.0 },
     calcium: { min: 11.2, max: 13.6, unit: "mg/dL", criticalLow: 9.0, criticalHigh: 16.0 },
+    t3: { min: 1.5, max: 3.2, unit: "nmol/L", criticalLow: 1.0, criticalHigh: 4.5 },
+    t4: { min: 18, max: 55, unit: "nmol/L", criticalLow: 12, criticalHigh: 85 },
+    tsh: { min: 0.05, max: 0.8, unit: "ng/mL", criticalLow: 0.02, criticalHigh: 1.2 },
   },
   cattle: {
     alt: { min: 11, max: 40, unit: "U/L", criticalHigh: 80 },
@@ -128,6 +142,9 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     cholesterol: { min: 80, max: 280, unit: "mg/dL", criticalHigh: 400 },
     phosphorus: { min: 5.6, max: 6.5, unit: "mg/dL", criticalHigh: 10.0 },
     calcium: { min: 9.7, max: 10.4, unit: "mg/dL", criticalLow: 8.0, criticalHigh: 12.0 },
+    t3: { min: 1.0, max: 2.2, unit: "nmol/L", criticalLow: 0.6, criticalHigh: 3.0 },
+    t4: { min: 12, max: 40, unit: "nmol/L", criticalLow: 8, criticalHigh: 60 },
+    tsh: { min: 0.02, max: 0.5, unit: "ng/mL", criticalLow: 0.01, criticalHigh: 0.8 },
   },
   // Using baseline values for remaining species with SGOT/SGPT added
   sheep: {
@@ -151,6 +168,9 @@ export const referenceRanges: Record<Species, SpeciesReferenceRanges> = {
     cholesterol: { min: 112, max: 320, unit: "mg/dL", criticalHigh: 500 },
     phosphorus: { min: 2.6, max: 6.2, unit: "mg/dL", criticalHigh: 10.0 },
     calcium: { min: 9.1, max: 11.7, unit: "mg/dL", criticalLow: 7.0, criticalHigh: 14.0 },
+    t3: { min: 1.0, max: 2.5, unit: "nmol/L", criticalLow: 0.6, criticalHigh: 3.5 },
+    t4: { min: 12, max: 45, unit: "nmol/L", criticalLow: 8, criticalHigh: 70 },
+    tsh: { min: 0.02, max: 0.5, unit: "ng/mL", criticalLow: 0.01, criticalHigh: 0.8 },
   },
   goat: {
     alt: { min: 10, max: 100, unit: "U/L", criticalHigh: 200 },

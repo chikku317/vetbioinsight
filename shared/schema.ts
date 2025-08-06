@@ -129,6 +129,11 @@ export const testResultsSchema = z.object({
   cholesterol: z.number().optional(),
   phosphorus: z.number().optional(),
   calcium: z.number().optional(),
+  
+  // Thyroid Function Panel
+  t3: z.number().optional(), // Triiodothyronine
+  t4: z.number().optional(), // Thyroxine
+  tsh: z.number().optional(), // Thyroid Stimulating Hormone
 });
 
 // First define all result schemas before using them

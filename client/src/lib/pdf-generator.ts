@@ -197,6 +197,14 @@ export function generateVetReportPDF(
         { key: "amylase", name: "Amylase", range: ranges.amylase },
         { key: "lipase", name: "Lipase", range: ranges.lipase }
       ]
+    },
+    {
+      name: "THYROID FUNCTION",
+      tests: [
+        { key: "t3", name: "T3 (Triiodothyronine)", range: ranges.t3 },
+        { key: "t4", name: "T4 (Thyroxine)", range: ranges.t4 },
+        { key: "tsh", name: "TSH", range: ranges.tsh }
+      ]
     }
   ];
 
@@ -234,15 +242,35 @@ export function generateVetReportPDF(
         pdf.setDrawColor(200, 200, 200);
         addLine(20, currentY + 2, pageWidth - 20, currentY + 2);
         
-        // Better text placement with proper column alignment
+        // Better text placement with proper column alignment and color coding for critical values
         addText(test.name, 25, currentY, { fontSize: 9 });
+        
+        // Set color for value text based on status - RED for critical/high values
+        const isHighOrCritical = status === "high" || status === "critical";
+        if (isHighOrCritical) {
+          pdf.setTextColor(220, 20, 20); // Red color for high/critical values
+        } else {
+          pdf.setTextColor(0, 0, 0); // Black color for normal/low values
+        }
+        
         addText(numericValue.toString(), 90, currentY, { fontSize: 9 });
+        
+        // Reset to black for other columns
+        pdf.setTextColor(0, 0, 0);
         addText(test.range.unit, 120, currentY, { fontSize: 9 });
         addText(`${test.range.min}-${test.range.max}`, 145, currentY, { fontSize: 9 });
+        
+        // Status label with red color for critical values
+        if (isHighOrCritical) {
+          pdf.setTextColor(220, 20, 20); // Red color for high/critical status
+        }
         addText(statusLabel, 180, currentY, { 
           fontSize: 9,
           fontStyle: status !== "normal" ? "bold" : "normal"
         });
+        
+        // Reset color for next iteration
+        pdf.setTextColor(0, 0, 0);
         
         currentY += 6;
       });

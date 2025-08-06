@@ -168,10 +168,84 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
     });
     
   } else if (report.reportType === 'biochemistry') {
-    // Use the existing complex biochemistry generator
-    // This will be handled by the original PDF generator
-    addText("For biochemistry reports, use the detailed generator.", 25, currentY, { fontSize: 10 });
-    currentY += 8;
+    // Handle biochemistry reports with color coding for critical values
+    const testResults = report.testResults as TestResults;
+    const ranges = referenceRanges[safeReport.species as Species];
+    
+    if (testResults && ranges) {
+      checkPageBreak(50);
+      addText("BIOCHEMISTRY TEST RESULTS", 20, currentY, { fontSize: 11, fontStyle: "bold" });
+      currentY += 10;
+      
+      // Test panels with thyroid function included
+      const testPanels = [
+        {
+          name: "LIVER FUNCTION",
+          tests: [
+            { key: "alt", name: "ALT", range: ranges.alt },
+            { key: "alp", name: "ALP", range: ranges.alp },
+            { key: "ggt", name: "GGT", range: ranges.ggt },
+            { key: "sgot", name: "SGOT", range: ranges.sgot },
+            { key: "sgpt", name: "SGPT", range: ranges.sgpt },
+            { key: "totalBilirubin", name: "Total Bilirubin", range: ranges.totalBilirubin }
+          ]
+        },
+        {
+          name: "KIDNEY FUNCTION", 
+          tests: [
+            { key: "bun", name: "BUN", range: ranges.bun },
+            { key: "creatinine", name: "Creatinine", range: ranges.creatinine }
+          ]
+        },
+        {
+          name: "THYROID FUNCTION",
+          tests: [
+            { key: "t3", name: "T3", range: ranges.t3 },
+            { key: "t4", name: "T4", range: ranges.t4 },
+            { key: "tsh", name: "TSH", range: ranges.tsh }
+          ]
+        }
+      ];
+
+      testPanels.forEach(panel => {
+        const testsWithValues = panel.tests.filter(test => {
+          const value = testResults[test.key as keyof TestResults];
+          return value !== undefined && value !== null && String(value).trim() !== "";
+        });
+
+        if (testsWithValues.length > 0) {
+          checkPageBreak(20);
+          addText(panel.name, 25, currentY, { fontSize: 10, fontStyle: "bold" });
+          currentY += 8;
+
+          testsWithValues.forEach(test => {
+            const value = testResults[test.key as keyof TestResults];
+            const numericValue = typeof value === 'number' ? value : Number(value);
+            const status = getTestStatus(test.key as keyof SpeciesReferenceRanges, numericValue, safeReport.species as Species);
+            const statusLabel = getStatusLabel(status);
+            
+            // Color coding for high/critical values
+            const isHighOrCritical = status === "high" || status === "critical";
+            
+            addText(`${test.name}:`, 25, currentY, { fontSize: 9 });
+            
+            // Set red color for high/critical values
+            if (isHighOrCritical) {
+              pdf.setTextColor(220, 20, 20);
+            }
+            
+            addText(`${numericValue} ${test.range.unit}`, 80, currentY, { fontSize: 9 });
+            addText(`(${statusLabel})`, 130, currentY, { fontSize: 9 });
+            
+            // Reset color to black
+            pdf.setTextColor(0, 0, 0);
+            
+            currentY += 6;
+          });
+          currentY += 5;
+        }
+      });
+    }
     
   } else {
     // Simplified format for other tests (Observation, Advice, Image)

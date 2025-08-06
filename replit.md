@@ -36,6 +36,23 @@ Each module features specialized input forms, field-specific validation, clinica
 - Reports linked to users via foreign key relationships
 - Session storage for persistent authentication
 
+✅ **Thyroid Profile Implementation** (Latest Update)
+- Added T3, T4, and TSH thyroid hormone tests to biochemistry panel
+- Complete thyroid reference ranges for all 11 supported animal species
+- Dedicated thyroid function test section in the user interface
+- Clinical alerts for abnormal thyroid values
+
+✅ **Color-Coded Critical Values in PDF Reports** (Latest Update)
+- Red font color for high and critical test values in PDF generation
+- Enhanced visual assessment for abnormal laboratory results
+- Implemented in both regular and simplified PDF generators
+- Maintains professional medical report standards with improved readability
+
+✅ **SGOT and SGPT Liver Enzyme Fix**
+- Successfully resolved missing SGOT and SGPT values in PDF reports
+- Both liver enzyme values now properly display in all generated reports
+- Complete liver function panel now includes all 6 enzyme markers
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

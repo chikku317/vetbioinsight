@@ -264,6 +264,39 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
         </CardContent>
       </Card>
 
+      {/* Thyroid Function Tests */}
+      <Card>
+        <CardHeader className="border-b border-gray-200">
+          <CardTitle className="flex items-center text-lg">
+            <Zap className="text-medical-blue mr-2 h-5 w-5" />
+            Thyroid Function Tests
+          </CardTitle>
+          <p className="text-sm text-medical-gray mt-1">Thyroid hormone levels and function</p>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TestField form={form} testKey="t3" label="T3 (Triiodothyronine)" unit="nmol/L" species={species} step="0.1" />
+            <TestField form={form} testKey="t4" label="T4 (Thyroxine)" unit="nmol/L" species={species} step="0.1" />
+            <TestField form={form} testKey="tsh" label="TSH (Thyroid Stimulating Hormone)" unit="ng/mL" species={species} step="0.01" />
+          </div>
+
+          {/* Clinical Alert for Thyroid Issues */}
+          {interpretations.find(i => i.panel === "Thyroid Function" && i.severity !== "normal") && (
+            <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-yellow-900 mb-2 flex items-center">
+                <span className="mr-1">⚠️</span>
+                Thyroid Alert
+              </h4>
+              <div className="text-sm text-yellow-800">
+                {interpretations.find(i => i.panel === "Thyroid Function")?.findings.map((finding, index) => (
+                  <p key={index} className="mb-1">{finding}</p>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Clinical Notes Panel */}
       <Card>
         <CardHeader className="border-b border-gray-200">
