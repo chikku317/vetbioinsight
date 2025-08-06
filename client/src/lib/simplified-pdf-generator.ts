@@ -1,7 +1,8 @@
 import jsPDF from "jspdf";
-import { VetReport } from "@shared/schema";
+import { VetReport, Species, TestResults } from "@shared/schema";
 import headerImagePath from "@assets/The MAin Header_1754116167505.png";
 import { PDFErrorHandler } from "./pdf-error-handler";
+import { referenceRanges, getTestStatus, getStatusLabel, SpeciesReferenceRanges } from "./reference-ranges";
 
 export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
   // Create a safe report with error handling

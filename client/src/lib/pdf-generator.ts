@@ -159,8 +159,8 @@ export function generateVetReportPDF(
         { key: "alt", name: "Alanine Aminotransferase (ALT)", range: ranges.alt },
         { key: "alp", name: "Alkaline Phosphatase (ALP)", range: ranges.alp },
         { key: "ggt", name: "Gamma Glutamyl Transferase (GGT)", range: ranges.ggt },
-        { key: "sgot", name: "Serum Glutamic Oxaloacetic Transaminase (SGOT)", range: ranges.sgot },
-        { key: "sgpt", name: "Serum Glutamic Pyruvic Transaminase (SGPT)", range: ranges.sgpt },
+        { key: "sgot", name: "SGOT", range: ranges.sgot },
+        { key: "sgpt", name: "SGPT", range: ranges.sgpt },
         { key: "totalBilirubin", name: "Total Bilirubin", range: ranges.totalBilirubin }
       ]
     },
