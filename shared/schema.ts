@@ -25,7 +25,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role").notNull().default("user"), // "user", "admin"
   fullName: text("full_name").notNull(),
-  email: varchar("email", { length: 100 }).unique(),
+  email: varchar("email", { length: 100 }),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

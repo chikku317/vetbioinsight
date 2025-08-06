@@ -227,7 +227,11 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
             // Color coding for high/critical values
             const isHighOrCritical = status === "high" || status === "critical";
             
-            addText(`${test.name}:`, 25, currentY, { fontSize: 9 });
+            // Enhanced column alignment for better readability
+            const testNameLines = pdf.splitTextToSize(`${test.name}:`, 50);
+            if (Array.isArray(testNameLines) && testNameLines.length > 0) {
+              addText(testNameLines[0], 25, currentY, { fontSize: 9 });
+            }
             
             // Set red color for high/critical values
             if (isHighOrCritical) {

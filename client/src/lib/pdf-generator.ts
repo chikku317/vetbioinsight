@@ -242,8 +242,12 @@ export function generateVetReportPDF(
         pdf.setDrawColor(200, 200, 200);
         addLine(20, currentY + 2, pageWidth - 20, currentY + 2);
         
-        // Better text placement with proper column alignment and color coding for critical values
-        addText(test.name, 25, currentY, { fontSize: 9 });
+        // Enhanced text placement with proper column alignment and text wrapping
+        // Test name column (25-85) - 60 width
+        const testNameLines = pdf.splitTextToSize(test.name, 60);
+        if (Array.isArray(testNameLines) && testNameLines.length > 0) {
+          addText(testNameLines[0], 25, currentY, { fontSize: 9 });
+        }
         
         // Set color for value text based on status - RED for critical/high values
         const isHighOrCritical = status === "high" || status === "critical";
@@ -253,14 +257,20 @@ export function generateVetReportPDF(
           pdf.setTextColor(0, 0, 0); // Black color for normal/low values
         }
         
+        // Value column (90-115) - 25 width
         addText(numericValue.toString(), 90, currentY, { fontSize: 9 });
         
         // Reset to black for other columns
         pdf.setTextColor(0, 0, 0);
-        addText(test.range.unit, 120, currentY, { fontSize: 9 });
-        addText(`${test.range.min}-${test.range.max}`, 145, currentY, { fontSize: 9 });
         
-        // Status label with red color for critical values
+        // Unit column (120-140) - 20 width
+        addText(test.range.unit, 120, currentY, { fontSize: 9 });
+        
+        // Reference range column (145-175) - 30 width
+        const rangeText = `${test.range.min}-${test.range.max}`;
+        addText(rangeText, 145, currentY, { fontSize: 9 });
+        
+        // Status column (180-210) - 30 width
         if (isHighOrCritical) {
           pdf.setTextColor(220, 20, 20); // Red color for high/critical status
         }
