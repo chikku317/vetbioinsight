@@ -7,7 +7,7 @@ async function seedDatabase() {
 
   try {
     // Create default users
-    const hashedAdminPassword = await hashPassword('admin123');
+    const hashedAdminPassword = await hashPassword('Chikku@1989');
     const hashedUser1Password = await hashPassword('user1pass');
     const hashedUser2Password = await hashPassword('user2pass');
 
@@ -44,7 +44,7 @@ async function seedDatabase() {
       
       console.log('✅ Default users created successfully!');
       console.log('📝 Login credentials:');
-      console.log('   Admin: admin / admin123');
+      console.log('   Admin: admin / Chikku@1989');
       console.log('   User 1: vet1 / user1pass');
       console.log('   User 2: vet2 / user2pass');
     } else {

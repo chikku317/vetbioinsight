@@ -117,16 +117,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             </form>
           </Form>
 
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <div className="text-sm text-gray-600">
-              <p className="font-medium mb-2">Demo Credentials:</p>
-              <div className="space-y-1 text-xs">
-                <p><strong>Admin:</strong> admin / admin123</p>
-                <p><strong>Vet 1:</strong> vet1 / user1pass</p>
-                <p><strong>Vet 2:</strong> vet2 / user2pass</p>
-              </div>
-            </div>
-          </div>
+
         </CardContent>
       </Card>
     </div>
