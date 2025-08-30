@@ -307,6 +307,22 @@ export function generateVetReportPDF(
     currentY += 6;
   }
 
+  // Notes section - Always include if notes are provided
+  if (safeReport.notes && typeof safeReport.notes === 'string' && safeReport.notes.trim() !== "") {
+    checkPageBreak(30);
+    addText("NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
+    currentY += 8;
+    
+    const notesLines = PDFErrorHandler.safeSplitTextToSize(pdf, safeReport.notes, pageWidth - 50);
+    notesLines.forEach((line: string) => {
+      checkPageBreak(6);
+      addText(line, 25, currentY, { fontSize: 9 });
+      currentY += 4;
+    });
+    
+    currentY += 6;
+  }
+
   // No footer - removed as requested
 
   return pdf;

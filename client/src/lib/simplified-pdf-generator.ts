@@ -293,6 +293,25 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
       currentY += 8;
     }
 
+    // Notes section - Always include if notes are provided
+    if (report.notes && typeof report.notes === 'string' && report.notes.trim()) {
+      checkPageBreak(30);
+      addText("NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
+      currentY += 8;
+      
+      const notesLines = pdf.splitTextToSize(report.notes.trim(), pageWidth - 50);
+      if (Array.isArray(notesLines)) {
+        notesLines.forEach((line: string) => {
+          if (line && typeof line === 'string') {
+            checkPageBreak(6);
+            addText(line, 25, currentY, { fontSize: 10 });
+            currentY += 5;
+          }
+        });
+      }
+      currentY += 8;
+    }
+
     // Image (if present)
     if (report.images && Array.isArray(report.images) && report.images.length > 0) {
       checkPageBreak(80);
