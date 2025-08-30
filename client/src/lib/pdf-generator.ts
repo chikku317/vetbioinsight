@@ -98,7 +98,7 @@ export function generateVetReportPDF(
     ["Parents Name:", report.parentsName || "N/A", "Medical Record:", report.medicalRecordNumber || "N/A"],
     ["Age/Weight:", `${report.age} ${report.ageUnit} / ${report.weight} ${report.weightUnit}`, "Collection Date:", report.collectionDate],
     ["Attending Veterinarian:", report.attendingVeterinarian || 'N/A', "Report Date:", report.reportDate],
-    ["Notes:", (report as any).dogNotes || 'N/A', "", ""]
+    ["Notes:", report.notes || 'N/A', "", ""]
   ];
 
   // Draw table with better alignment (simple clean table)

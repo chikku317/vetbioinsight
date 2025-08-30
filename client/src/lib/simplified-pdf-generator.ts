@@ -94,13 +94,13 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
     [`Collection Date:`, safeReport.collectionDate],
     [`Report Date:`, safeReport.reportDate],
     [`Attending Veterinarian:`, safeReport.attendingVeterinarian],
-    [`Notes:`, (safeReport as any).dogNotes || 'N/A'],
+    [`Notes:`, safeReport.notes || 'N/A'],
     [`Follow-up Date:`, safeReport.followUpDate || 'N/A'],
   ];
 
   patientInfo.forEach(([label, value]) => {
     addText(label, 25, currentY, { fontSize: 10, fontStyle: "bold" });
-    addText(value.toString(), 100, currentY, { fontSize: 10 });
+    addText((value || '').toString(), 100, currentY, { fontSize: 10 });
     currentY += 6;
   });
 
@@ -133,7 +133,7 @@ export function generateSimplifiedReportPDF(report: VetReport): jsPDF {
       addText("DOCTOR NOTES", 20, currentY, { fontSize: 11, fontStyle: "bold" });
       currentY += 8;
       
-      const notesLines = PDFErrorHandler.safeSplitTextToSize(pdf, safeReport.notes, pageWidth - 50);
+      const notesLines = PDFErrorHandler.safeSplitTextToSize(pdf, report.notes, pageWidth - 50);
       notesLines.forEach((line: string) => {
         checkPageBreak(6);
         addText(line, 25, currentY, { fontSize: 10 });
