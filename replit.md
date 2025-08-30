@@ -70,6 +70,12 @@ Each module features specialized input forms, field-specific validation, clinica
 - All user accounts functional: admin/Chikku@1989, vet1/user1pass, vet2/user2pass
 - Memory storage temporarily used due to database endpoint issues
 
+✅ **Deployment Configuration for Always-On Access** (Latest Update)
+- Application configured for Reserved VM Deployment to prevent "Not Found" errors
+- Reserved VM keeps the application running continuously without scaling down
+- Eliminates idle timeouts and ensures 24/7 availability
+- Professional deployment suitable for production veterinary lab system
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
