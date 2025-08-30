@@ -261,7 +261,7 @@ export function PatientInfoPanel({ form }: PatientInfoPanelProps) {
 
           <FormField
             control={form.control}
-            name="dogNotes"
+            name="notes"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Notes</FormLabel>
