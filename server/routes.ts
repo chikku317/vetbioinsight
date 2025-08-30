@@ -10,27 +10,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add cookie parser middleware
   app.use(cookieParser());
 
+  // Debug endpoint to check available users (for deployment troubleshooting)
+  app.get("/api/debug/users", async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json({
+        totalUsers: users.length,
+        usernames: users.map(u => u.username),
+        environment: process.env.NODE_ENV || 'unknown'
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Debug failed", details: error.message });
+    }
+  });
+
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
       const credentials = loginSchema.parse(req.body);
+      console.log("Login attempt for username:", credentials.username);
       
       const user = await storage.getUserByUsername(credentials.username);
       if (!user || !user.isActive) {
+        console.log("User not found or inactive:", credentials.username);
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
       const isValidPassword = await verifyPassword(credentials.password, user.password);
       if (!isValidPassword) {
+        console.log("Invalid password for username:", credentials.username);
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
       const sessionId = await createSession(user.id);
+      console.log("Session created for user:", credentials.username);
       
       res.cookie('sessionId', sessionId, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Allow HTTP cookies in deployed environment
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'lax', // Allow cross-site cookies
+        path: '/', // Ensure cookie is available site-wide
       });
       
       res.json({
