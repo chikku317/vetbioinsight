@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertVetReportSchema, insertUserSchema, loginSchema, User, LoginCredentials } from "@shared/schema";
-import { requireAuth, requireAdmin, createSession, deleteSession, verifyPassword } from "./auth";
+import { requireAuth, requireAdmin, createSession, deleteSession, verifyPassword } from "./memory-auth";
 import cookieParser from "cookie-parser";
 import { z } from "zod";
 

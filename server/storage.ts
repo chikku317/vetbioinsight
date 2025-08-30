@@ -73,7 +73,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteUser(id: number): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.id, id));
-    return result.rowCount > 0;
+    return Array.isArray(result) ? result.length > 0 : true;
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -113,7 +113,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteReport(id: string): Promise<boolean> {
     const result = await db.delete(vetReports).where(eq(vetReports.id, id));
-    return result.rowCount > 0;
+    return Array.isArray(result) ? result.length > 0 : true;
   }
 
   async getAllReports(): Promise<VetReport[]> {
@@ -156,7 +156,7 @@ class MemStorage implements IStorage {
     {
       id: 2,
       username: "vet1",
-      password: "$2b$12$PzebgRxudLmV4mHdAipiceOSwHsktgD2C90gKT1jPQW9qwJFtUg6C", // user1pass
+      password: "$2b$12$Df9H0xbj880/5C7.gKS.UeIRSNTBcxiMoPvC9XWfmFbBolN.JICg.", // user1pass
       role: "user",
       fullName: "Dr. Sarah Johnson",
       email: "vet1@vetnest.com",
@@ -167,7 +167,7 @@ class MemStorage implements IStorage {
     {
       id: 3,
       username: "vet2",
-      password: "$2b$12$PzebgRxudLmV4mHdAipiceOSwHsktgD2C90gKT1jPQW9qwJFtUg6C", // user2pass
+      password: "$2b$12$EMaHYJbrKfXDpekyfh0FguAiWnOkHDP7T.vkHjx5t8xE0oUHYLoje", // user2pass
       role: "user",
       fullName: "Dr. Michael Chen",
       email: "vet2@vetnest.com",
@@ -193,6 +193,10 @@ class MemStorage implements IStorage {
       ...user,
       id: this.nextUserId++,
       password: hashedPassword,
+      role: user.role || 'user',
+      fullName: user.fullName,
+      email: user.email || null,
+      isActive: user.isActive !== undefined ? user.isActive : true,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -236,6 +240,17 @@ class MemStorage implements IStorage {
       ...report,
       id: `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       createdBy: userId,
+      parentsName: report.parentsName || null,
+      breed: report.breed || null,
+      medicalRecordNumber: report.medicalRecordNumber || null,
+      followUpDate: report.followUpDate || null,
+      observation: report.observation || null,
+      advice: report.advice || null,
+      notes: report.notes || null,
+      dogNotes: report.dogNotes || null,
+      images: report.images || [],
+      clinicalNotes: report.clinicalNotes || null,
+      clinicalNotesEnabled: report.clinicalNotesEnabled || false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
