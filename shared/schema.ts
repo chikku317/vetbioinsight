@@ -78,10 +78,21 @@ export const sessions = pgTable("sessions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Password reset tokens table
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: serial("user_id").notNull().references(() => users.id),
+  token: varchar("token", { length: 100 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  used: boolean("used").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   reports: many(vetReports),
   sessions: many(sessions),
+  passwordResetTokens: many(passwordResetTokens),
 }));
 
 export const vetReportsRelations = relations(vetReports, ({ one }) => ({
@@ -94,6 +105,13 @@ export const vetReportsRelations = relations(vetReports, ({ one }) => ({
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, {
     fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
+export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordResetTokens.userId],
     references: [users.id],
   }),
 }));
@@ -252,11 +270,46 @@ export const insertVetReportSchema = createInsertSchema(vetReports).omit({
   clinicalNotesEnabled: z.boolean().default(false),
 });
 
+// Password reset schemas
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Reset token is required"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+export const updateProfileSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().email("Please enter a valid email address").optional(),
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.preprocess((val) => val === "" ? undefined : val, z.string().min(8, "Password must be at least 8 characters").optional()),
+  confirmPassword: z.preprocess((val) => val === "" ? undefined : val, z.string().optional()),
+}).refine((data) => {
+  if (data.newPassword && data.newPassword !== data.confirmPassword) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginCredentials = z.infer<typeof loginSchema>;
 export type Session = typeof sessions.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
+export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
 
 export type InsertVetReport = z.infer<typeof insertVetReportSchema>;
 export type VetReport = typeof vetReports.$inferSelect;

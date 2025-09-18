@@ -1,28 +1,31 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVetReportSchema, insertUserSchema, loginSchema, User, LoginCredentials } from "@shared/schema";
-import { requireAuth, requireAdmin, createSession, deleteSession, verifyPassword } from "./memory-auth";
+import { insertVetReportSchema, insertUserSchema, loginSchema, User, LoginCredentials, forgotPasswordSchema, resetPasswordSchema, updateProfileSchema } from "@shared/schema";
+import { requireAuth, requireAdmin, createSession, deleteSession, verifyPassword, hashPassword } from "./memory-auth";
 import cookieParser from "cookie-parser";
 import { z } from "zod";
+import { nanoid } from "nanoid";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Add cookie parser middleware
   app.use(cookieParser());
 
-  // Debug endpoint to check available users (for deployment troubleshooting)
-  app.get("/api/debug/users", async (req, res) => {
-    try {
-      const users = await storage.getAllUsers();
-      res.json({
-        totalUsers: users.length,
-        usernames: users.map(u => u.username),
-        environment: process.env.NODE_ENV || 'unknown'
-      });
-    } catch (error) {
-      res.status(500).json({ error: "Debug failed", details: error.message });
-    }
-  });
+  // Debug endpoint to check available users (development only)
+  if (process.env.NODE_ENV !== 'production') {
+    app.get("/api/debug/users", async (req, res) => {
+      try {
+        const users = await storage.getAllUsers();
+        res.json({
+          totalUsers: users.length,
+          usernames: users.map(u => u.username),
+          environment: process.env.NODE_ENV || 'unknown'
+        });
+      } catch (error) {
+        res.status(500).json({ error: "Debug failed", details: (error as Error).message });
+      }
+    });
+  }
 
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
@@ -47,10 +50,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.cookie('sessionId', sessionId, {
         httpOnly: true,
-        secure: false, // Allow HTTP cookies in deployed environment
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: 'lax', // Allow cross-site cookies
-        path: '/', // Ensure cookie is available site-wide
+        sameSite: 'lax',
+        path: '/',
       });
       
       res.json({
@@ -212,6 +215,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting report:", error);
       res.status(500).json({ error: "Failed to delete report" });
+    }
+  });
+
+  // Password reset routes
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = forgotPasswordSchema.parse(req.body);
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if user exists for security
+        return res.json({ message: "If an account with that email exists, a password reset link has been sent." });
+      }
+
+      // Clean up expired tokens first
+      await storage.cleanupExpiredTokens();
+      
+      // Generate reset token
+      const resetToken = nanoid(32);
+      const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+      
+      await storage.createPasswordResetToken(user.id, resetToken, expiresAt);
+      
+      const response: any = { 
+        message: "If an account with that email exists, a password reset link has been sent."
+      };
+      
+      // Only include reset token in development (for testing without email)
+      if (process.env.NODE_ENV !== 'production') {
+        response.resetToken = resetToken;
+      }
+      
+      res.json(response);
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(400).json({ error: "Failed to process request" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = resetPasswordSchema.parse(req.body);
+      
+      const resetToken = await storage.getPasswordResetToken(token);
+      if (!resetToken || resetToken.used || resetToken.expiresAt < new Date()) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+      
+      // Update user password (storage will handle hashing)
+      await storage.updateUser(resetToken.userId, { password: newPassword });
+      
+      // Mark token as used
+      await storage.markTokenAsUsed(token);
+      
+      res.json({ message: "Password has been reset successfully" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(400).json({ error: "Failed to reset password" });
+    }
+  });
+
+  // Admin profile management routes
+  app.put("/api/auth/profile", requireAuth, async (req, res) => {
+    try {
+      const { username, fullName, email, currentPassword, newPassword } = updateProfileSchema.parse(req.body);
+      const userId = req.user!.id;
+      
+      // Verify current password
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const isValidPassword = await verifyPassword(currentPassword, user.password);
+      if (!isValidPassword) {
+        return res.status(400).json({ error: "Current password is incorrect" });
+      }
+      
+      // Check if username is already taken by another user
+      if (username !== user.username) {
+        const existingUser = await storage.getUserByUsername(username);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ error: "Username is already taken" });
+        }
+      }
+      
+      // Prepare updates
+      const updates: any = {
+        username,
+        fullName,
+        email: email || null,
+      };
+      
+      // Update password if provided and not empty
+      if (newPassword && newPassword.trim()) {
+        updates.password = newPassword; // hashPassword will be called in storage
+      }
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Failed to update user" });
+      }
+      
+      res.json({
+        user: {
+          id: updatedUser.id,
+          username: updatedUser.username,
+          role: updatedUser.role,
+          fullName: updatedUser.fullName,
+          email: updatedUser.email,
+        }
+      });
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(400).json({ error: "Failed to update profile" });
     }
   });
 

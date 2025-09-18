@@ -1,16 +1,23 @@
 import { db } from './db';
-import { users, vetReports, User, InsertUser, VetReport, InsertVetReport } from "@shared/schema";
-import { eq } from 'drizzle-orm';
-import { hashPassword } from './auth';
+import { users, vetReports, passwordResetTokens, User, InsertUser, VetReport, InsertVetReport, PasswordResetToken } from "@shared/schema";
+import { eq, and, lt, gt } from 'drizzle-orm';
+import { hashPassword } from './memory-auth';
 
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
   deleteUser(id: number): Promise<boolean>;
   getAllUsers(): Promise<User[]>;
+  
+  // Password reset operations
+  createPasswordResetToken(userId: number, token: string, expiresAt: Date): Promise<PasswordResetToken>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  markTokenAsUsed(token: string): Promise<boolean>;
+  cleanupExpiredTokens(): Promise<boolean>;
   
   // Report operations
   getReport(id: string): Promise<VetReport | undefined>;
@@ -35,6 +42,11 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
@@ -78,6 +90,59 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return db.select().from(users);
+  }
+
+  // Password reset operations
+  async createPasswordResetToken(userId: number, token: string, expiresAt: Date): Promise<PasswordResetToken> {
+    const hashedToken = await hashPassword(token);
+    const [newToken] = await db
+      .insert(passwordResetTokens)
+      .values({
+        userId: userId,
+        token: hashedToken,
+        expiresAt: expiresAt,
+      })
+      .returning();
+    
+    return newToken;
+  }
+
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    // Get all unused, non-expired tokens for verification
+    const tokens = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(and(eq(passwordResetTokens.used, false), gt(passwordResetTokens.expiresAt, new Date())));
+    
+    // Find token by comparing hashes
+    for (const resetToken of tokens) {
+      const { verifyPassword } = await import('./memory-auth');
+      if (await verifyPassword(token, resetToken.token)) {
+        return resetToken;
+      }
+    }
+    
+    return undefined;
+  }
+
+  async markTokenAsUsed(token: string): Promise<boolean> {
+    // Find the token first
+    const resetToken = await this.getPasswordResetToken(token);
+    if (!resetToken) return false;
+    
+    const result = await db
+      .update(passwordResetTokens)
+      .set({ used: true })
+      .where(eq(passwordResetTokens.id, resetToken.id));
+    return Array.isArray(result) ? result.length > 0 : true;
+  }
+
+  async cleanupExpiredTokens(): Promise<boolean> {
+    const now = new Date();
+    await db
+      .delete(passwordResetTokens)
+      .where(lt(passwordResetTokens.expiresAt, now));
+    return true;
   }
 
   // Report operations
@@ -177,7 +242,9 @@ class MemStorage implements IStorage {
     }
   ];
   private reports: VetReport[] = [];
+  private resetTokens: PasswordResetToken[] = [];
   private nextUserId = 4;
+  private nextTokenId = 1;
 
   async getUser(id: number): Promise<User | undefined> {
     return this.users.find(u => u.id === id);
@@ -185,6 +252,10 @@ class MemStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     return this.users.find(u => u.username === username);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return this.users.find(u => u.email === email);
   }
 
   async createUser(user: InsertUser): Promise<User> {
@@ -231,6 +302,48 @@ class MemStorage implements IStorage {
     return [...this.users];
   }
 
+  // Password reset operations
+  async createPasswordResetToken(userId: number, token: string, expiresAt: Date): Promise<PasswordResetToken> {
+    const hashedToken = await hashPassword(token);
+    const newToken: PasswordResetToken = {
+      id: `token_${this.nextTokenId++}`,
+      userId: userId,
+      token: hashedToken,
+      expiresAt: expiresAt,
+      used: false,
+      createdAt: new Date(),
+    };
+    this.resetTokens.push(newToken);
+    return newToken;
+  }
+
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const { verifyPassword } = await import('./memory-auth');
+    for (const resetToken of this.resetTokens) {
+      if (!resetToken.used && resetToken.expiresAt > new Date() && 
+          await verifyPassword(token, resetToken.token)) {
+        return resetToken;
+      }
+    }
+    return undefined;
+  }
+
+  async markTokenAsUsed(token: string): Promise<boolean> {
+    const resetToken = await this.getPasswordResetToken(token);
+    if (!resetToken) return false;
+    
+    const tokenIndex = this.resetTokens.findIndex(t => t.id === resetToken.id);
+    if (tokenIndex === -1) return false;
+    this.resetTokens[tokenIndex].used = true;
+    return true;
+  }
+
+  async cleanupExpiredTokens(): Promise<boolean> {
+    const now = new Date();
+    this.resetTokens = this.resetTokens.filter(t => t.expiresAt > now);
+    return true;
+  }
+
   async getReport(id: string): Promise<VetReport | undefined> {
     return this.reports.find(r => r.id === id);
   }
@@ -240,6 +353,9 @@ class MemStorage implements IStorage {
       ...report,
       id: `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       createdBy: userId,
+      reportType: report.reportType || "biochemistry",
+      ageUnit: report.ageUnit || "years",
+      weightUnit: report.weightUnit || "kg", 
       parentsName: report.parentsName || null,
       breed: report.breed || null,
       medicalRecordNumber: report.medicalRecordNumber || null,
@@ -298,5 +414,5 @@ class MemStorage implements IStorage {
   }
 }
 
-// Use memory storage temporarily due to database connection issues
-export const storage = new MemStorage();
+// Use persistent database storage  
+export const storage = new DatabaseStorage();
