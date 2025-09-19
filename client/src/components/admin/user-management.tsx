@@ -11,9 +11,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { UserPlus, Edit, Trash2, Shield, User as UserIcon } from "lucide-react";
+import { z } from "zod";
+
+// Edit user schema (password is optional for updates)
+const editUserSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  fullName: z.string().min(1, "Full name is required"), 
+  email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  password: z.string().optional().or(z.literal("")),
+  role: z.enum(["user", "admin"]),
+  isActive: z.boolean(),
+});
+
+type EditUserData = z.infer<typeof editUserSchema>;
 
 export function UserManagement() {
   const { toast } = useToast();
@@ -25,8 +39,22 @@ export function UserManagement() {
     retry: false,
   });
 
+  const usersArray = Array.isArray(users) ? users : [];
+
   const createUserForm = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      role: "user",
+      fullName: "",
+      email: "",
+      isActive: true,
+    },
+  });
+
+  const editUserForm = useForm<EditUserData>({
+    resolver: zodResolver(editUserSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -59,6 +87,28 @@ export function UserManagement() {
     },
   });
 
+  const editUserMutation = useMutation({
+    mutationFn: async ({ userId, userData }: { userId: number; userData: EditUserData }) => {
+      return apiRequest("PUT", `/api/users/${userId}`, userData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "User updated",
+        description: "User has been updated successfully.",
+      });
+      setEditingUser(null);
+      editUserForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
       return apiRequest("DELETE", `/api/users/${userId}`);
@@ -81,6 +131,30 @@ export function UserManagement() {
 
   const handleCreateUser = (data: InsertUser) => {
     createUserMutation.mutate(data);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    editUserForm.reset({
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email || "",
+      role: user.role as "user" | "admin",
+      isActive: user.isActive,
+      password: "", // Leave password empty for optional update
+    });
+  };
+
+  const handleUpdateUser = (data: EditUserData) => {
+    if (!editingUser) return;
+    
+    // Remove password from data if it's empty (optional update)
+    const updateData = { ...data };
+    if (!updateData.password || updateData.password.trim() === "") {
+      delete updateData.password;
+    }
+    
+    editUserMutation.mutate({ userId: editingUser.id, userData: updateData });
   };
 
   const handleDeleteUser = (userId: number) => {
@@ -157,7 +231,7 @@ export function UserManagement() {
                     <FormItem>
                       <FormLabel>Email (Optional)</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john@example.com" {...field} />
+                        <Input type="email" placeholder="john@example.com" value={field.value || ""} onChange={field.onChange} onBlur={field.onBlur} name={field.name} ref={field.ref} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -214,8 +288,135 @@ export function UserManagement() {
         </Dialog>
       </div>
 
+      {/* Edit User Dialog */}
+      <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>
+              Update user account information and permissions.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingUser && (
+            <Form {...editUserForm}>
+              <form onSubmit={editUserForm.handleSubmit(handleUpdateUser)} className="space-y-4">
+                <FormField
+                  control={editUserForm.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Dr. John Smith" {...field} data-testid="input-edit-fullname" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editUserForm.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input placeholder="jsmith" {...field} data-testid="input-edit-username" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editUserForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email (Optional)</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="john@example.com" value={field.value || ""} onChange={field.onChange} onBlur={field.onBlur} name={field.name} ref={field.ref} data-testid="input-edit-email" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editUserForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Password (Optional)</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Leave empty to keep current password" {...field} data-testid="input-edit-password" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editUserForm.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-edit-role">
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="admin">Administrator</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editUserForm.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>Active Status</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Inactive users cannot log in to the system
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="switch-edit-active"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setEditingUser(null)} data-testid="button-edit-cancel">
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={editUserMutation.isPending} data-testid="button-edit-save">
+                    {editUserMutation.isPending ? "Updating..." : "Update User"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <div className="grid gap-4">
-        {users && users.map((user: User) => (
+        {usersArray.map((user: User) => (
           <Card key={user.id}>
             <CardContent className="flex items-center justify-between p-6">
               <div className="flex items-center gap-4">
@@ -245,7 +446,12 @@ export function UserManagement() {
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" disabled>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleEditUser(user)}
+                  data-testid={`button-edit-user-${user.id}`}
+                >
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button 
@@ -253,6 +459,7 @@ export function UserManagement() {
                   size="sm"
                   onClick={() => handleDeleteUser(user.id)}
                   disabled={deleteUserMutation.isPending}
+                  data-testid={`button-delete-user-${user.id}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -262,7 +469,7 @@ export function UserManagement() {
         ))}
       </div>
 
-      {users && users.length === 0 && (
+      {usersArray.length === 0 && (
         <Alert>
           <AlertDescription>
             No users found. Create your first user to get started.
