@@ -275,9 +275,9 @@ export function TestResultPanel({ form }: TestResultPanelProps) {
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TestField form={form} testKey="t3" label="T3 (Triiodothyronine)" unit="nmol/L" species={species} step="0.1" />
-            <TestField form={form} testKey="t4" label="T4 (Thyroxine)" unit="nmol/L" species={species} step="0.1" />
-            <TestField form={form} testKey="tsh" label="TSH (Thyroid Stimulating Hormone)" unit="μg/dl" species={species} step="0.01" />
+            <TestField form={form} testKey="t3" label="T3 (Triiodothyronine)" unit="ng/dl" species={species} step="0.1" />
+            <TestField form={form} testKey="t4" label="T4 (Thyroxine)" unit="μg/dl" species={species} step="0.1" />
+            <TestField form={form} testKey="tsh" label="TSH (Thyroid Stimulating Hormone)" unit="μIU/ml" species={species} step="0.01" />
           </div>
 
           {/* Clinical Alert for Thyroid Issues */}
